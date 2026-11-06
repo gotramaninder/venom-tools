@@ -1,0 +1,16 @@
+{
+  "name": "VENOM OS // ANOS-01",
+  "short_name": "VENOM OS",
+  "description": "Autonomous Neural Operating System — Command Center",
+  "start_url": "./venom-os.html",
+  "display": "standalone",
+  "background_color": "#030406",
+  "theme_color": "#07080C",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
