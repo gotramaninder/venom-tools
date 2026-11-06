@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VENOM OS // ANOS-01 COMMAND PLATFORM</title>
+  <link rel="stylesheet" href="./src/tokens/tokens.css">
+  <link rel="stylesheet" href="./src/styles/base.css">
+  <link rel="stylesheet" href="./src/styles/components.css">
+  <link rel="stylesheet" href="./src/styles/responsive.css">
+  <style>
+    /* VENOM OS Monolithic Desktop Shell Styles */
+    :root {
+      --vnm-nav-width: 250px;
+    }
+
+    body {
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      background: var(--vnm-void);
+      user-select: none;
+    }
+
+    /* Cinematic Boot Sequence Overlay */
+    #boot-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--vnm-void);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 400ms var(--vnm-ease-tactical), visibility 400ms;
+    }
+
+    #boot-screen.boot-finished {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .boot-orb-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--vnm-sp-6);
+    }
+
+    .boot-ring {
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--vnm-crimson-border);
+      border-radius: 50%;
+      animation: boot-pulse 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    }
+
+    .boot-ring-inner {
+      position: absolute;
+      inset: 15px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      animation: vnm-spin 12s linear infinite;
+    }
+
+    .boot-core {
+      width: 48px;
+      height: 48px;
+      background: var(--vnm-crimson-core);
+      border-radius: 50%;
+      box-shadow: 0 0 32px var(--vnm-crimson-pulse);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--vnm-font-display);
+      font-weight: 700;
+      font-size: 20px;
+      color: #fff;
+    }
+
+    @keyframes boot-pulse {
+      0% { transform: scale(0.9); opacity: 0.4; }
+      50% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.4; }
+    }
+
+    .boot-log-terminal {
+      width: 460px;
+      max-width: 90vw;
+      background: var(--vnm-surface-blade);
+      border: var(--vnm-border-edge);
+      border-radius: var(--vnm-radius-sharp);
+      padding: var(--vnm-sp-4);
+      font-family: var(--vnm-font-mono);
+      font-size: 11px;
+      color: var(--vnm-text-titanium);
+      line-height: 1.6;
+      height: 120px;
+      overflow: hidden;
+      box-shadow: var(--vnm-shadow-elevated);
+      margin-bottom: var(--vnm-sp-5);
+    }
+
+    /* Main Desktop Shell */
+    .os-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Horizon Bar */
+    .os-horizon {
+      height: 38px;
+      background: var(--vnm-obsidian);
+      border-bottom: var(--vnm-border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--vnm-sp-4);
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .os-horizon-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--vnm-sp-3);
+      font-family: var(--vnm-font-display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--vnm-text-specular);
+    }
+
+    .os-horizon-tools {
+      display: flex;
+      align-items: center;
+      gap: var(--vnm-sp-3);
+    }
+
+    /* Navigation Rail */
+    .os-workspace-body {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 38px);
+      overflow: hidden;
+    }
+
+    .os-nav-rail {
+      width: var(--vnm-nav-width);
+      background: var(--vnm-obsidian);
+      border-right: var(--vnm-border-subtle);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .nav-group-title {
+      font-family: var(--vnm-font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--vnm-text-alloy);
+      padding: var(--vnm-sp-3) var(--vnm-sp-4) 4px var(--vnm-sp-4);
+    }
+
+    .os-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--vnm-sp-3);
+      padding: 7px var(--vnm-sp-4);
+      font-family: var(--vnm-font-sans);
+      font-size: 13px;
+      color: var(--vnm-text-titanium);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: var(--vnm-transition-color);
+      border-left: 2px solid transparent;
+      white-space: nowrap;
+    }
+
+    .os-nav-btn:hover {
+      background: var(--vnm-surface-elevated);
+      color: var(--vnm-text-specular);
+    }
+
+    .os-nav-btn.active-screen {
+      background: var(--vnm-surface-blade);
+      color: var(--vnm-text-specular);
+      border-left-color: var(--vnm-crimson-core);
+      font-weight: 600;
+    }
+
+    .os-nav-btn .nav-icon {
+      font-family: var(--vnm-font-mono);
+      font-size: 12px;
+      color: var(--vnm-crimson-core);
+      width: 18px;
+      text-align: center;
+    }
+
+    /* Screen Viewport Stage */
+    .os-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--vnm-void);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Screen State Bar (Mandatory Requirement: Default, Empty, Loading, Error, Success) */
+    .screen-state-toolbar {
+      height: 38px;
+      background: var(--vnm-surface-blade);
+      border-bottom: var(--vnm-border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--vnm-sp-4);
+      flex-shrink: 0;
+    }
+
+    .screen-title-area {
+      display: flex;
+      align-items: center;
+      gap: var(--vnm-sp-3);
+      font-family: var(--vnm-font-mono);
+      font-size: 12px;
+      color: var(--vnm-text-specular);
+      font-weight: 600;
+    }
+
+    .state-switch-pillbox {
+      display: flex;
+      background: var(--vnm-surface-elevated);
+      border: var(--vnm-border-subtle);
+      border-radius: var(--vnm-radius-sharp);
+      padding: 2px;
+    }
+
+    .state-switch-btn {
+      background: transparent;
+      border: none;
+      padding: 3px 8px;
+      font-family: var(--vnm-font-mono);
+      font-size: 10px;
+      color: var(--vnm-text-alloy);
+      cursor: pointer;
+      border-radius: 1px;
+      text-transform: uppercase;
+      transition: var(--vnm-transition-color);
+    }
+
+    .state-switch-btn:hover {
+      color: var(--vnm-text-specular);
+    }
+
+    .state-switch-btn.active-state {
+      background: var(--vnm-crimson-core);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Screen Content Container */
+    .screen-canvas {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--vnm-sp-5);
+    }
+
+    /* Screen View Wrappers */
+    .screen-view {
+      display: none;
+      animation: vnm-fade-down 140ms var(--vnm-ease-tactical);
+      height: 100%;
+    }
+
+    .screen-view.active {
+      display: block;
+    }
+
+    /* Generic State Card Styles */
+    .state-card-empty, .state-card-error, .state-card-loading, .state-card-success {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--vnm-sp-16) var(--vnm-sp-6);
+      background: var(--vnm-surface-blade);
+      border: var(--vnm-border-edge);
+      border-radius: var(--vnm-radius-sharp);
+      margin: var(--vnm-sp-6) auto;
+      max-width: 640px;
+      box-shadow: var(--vnm-shadow-chassis);
+    }
+
+    .state-card-empty .state-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.6; }
+    .state-card-error .state-icon { font-size: 36px; margin-bottom: 12px; color: var(--vnm-status-danger); }
+    .state-card-success .state-icon { font-size: 36px; margin-bottom: 12px; color: var(--vnm-status-emerald); }
+
+    /* Skeleton Loading Line */
+    .skeleton-line {
+      height: 14px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-sweep 1.6s infinite;
+      border-radius: 2px;
+      margin-bottom: 10px;
+    }
+
+    @keyframes skeleton-sweep {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Acoustic Voice Waveform */
+    .voice-orb {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--vnm-crimson-core) 0%, rgba(12,14,20,0.8) 70%);
+      box-shadow: 0 0 40px rgba(224, 17, 58, 0.45);
+      margin: 0 auto 24px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: voice-pulse 2s infinite alternate ease-in-out;
+    }
+
+    @keyframes voice-pulse {
+      from { transform: scale(0.96); box-shadow: 0 0 20px rgba(224, 17, 58, 0.3); }
+      to { transform: scale(1.08); box-shadow: 0 0 50px rgba(224, 17, 58, 0.7); }
+    }
+
+    .audio-frequency-bars {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 48px;
+      margin-bottom: 24px;
+    }
+
+    .freq-bar {
+      width: 4px;
+      background: var(--vnm-crimson-core);
+      border-radius: 2px;
+      animation: bar-dance 1s infinite alternate ease-in-out;
+    }
+
+    @keyframes bar-dance {
+      from { height: 8px; opacity: 0.3; }
+      to { height: 44px; opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       SCREEN 01: CINEMATIC BOOT SCREEN (ANOS-01 INITIALIZATION)
+       ========================================================================= -->
+  <div id="boot-screen">
+    <div class="boot-orb-container">
+      <div class="boot-ring"></div>
+      <div class="boot-ring-inner"></div>
+      <div class="boot-core">V</div>
+    </div>
+    <h2 style="font-family: var(--vnm-font-display); font-size: 20px; letter-spacing: 0.15em; color: var(--vnm-text-specular); margin-bottom: 4px;">VENOM OS // ANOS-01</h2>
+    <p style="font-family: var(--vnm-font-mono); font-size: 11px; color: var(--vnm-text-alloy); margin-bottom: 16px;">AUTONOMOUS NEURAL OPERATING SYSTEM</p>
+    
+    <div class="boot-log-terminal" id="boot-terminal-log">
+      <div>[0.001s] HARDWARE INTERFACE: 64-BIT SUBSTRATE ATTACHED</div>
+      <div>[0.012s] OPTICAL SHADER PIPELINE: OBSIDIAN STACK INITIALIZED</div>
+      <div>[0.034s] ENCRYPTION ENGINE: AES-256-GCM PARITY VERIFIED</div>
+      <div>[0.062s] LOCAL THREAD POOL: 16 WORKERS READY</div>
+      <div style="color: var(--vnm-crimson-pulse);">[0.098s] NEURAL SUBSYSTEM: TACTICAL FOUNDATION ARMED</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <button type="button" class="vnm-btn vnm-btn-primary" id="btn-enter-os">
+        <span>ENTER WORKSPACE</span>
+      </button>
+      <button type="button" class="vnm-btn vnm-btn-ghost vnm-btn-sm" id="btn-skip-boot">
+        <span>SKIP SEQUENCE [ESC]</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MONOLITHIC VENOM OS SHELL
+       ========================================================================= -->
+  <div class="os-shell">
+
+    <!-- TOP SYSTEM HORIZON BAR -->
+    <header class="os-horizon">
+      <div class="os-horizon-brand">
+        <span class="vnm-nav-brand-pip"></span>
+        <span>VENOM OS</span>
+        <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy); margin-left: 6px;">[ANOS-01]</span>
+      </div>
+
+      <div class="os-horizon-tools">
+        <!-- Live System Clock -->
+        <span class="vnm-mono" id="os-live-clock" style="font-size: 11px; color: var(--vnm-text-titanium); margin-right: 8px;">16:30:00 UTC</span>
+        
+        <!-- Command Palette Trigger -->
+        <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm" id="btn-os-cmd" title="Open Command Palette (Ctrl+K)">
+          <span class="vnm-mono">⌘K</span>
+        </button>
+
+        <!-- Viewport Switcher -->
+        <button type="button" class="vnm-btn vnm-btn-ghost vnm-btn-sm" id="btn-toggle-responsive" title="Toggle Responsive Width Mode">
+          <span id="vp-label">DESKTOP (100%)</span>
+        </button>
+
+        <!-- Motion Toggle -->
+        <button type="button" class="vnm-btn vnm-btn-ghost vnm-btn-sm" id="btn-motion-toggle" title="Toggle Reduced Motion">
+          <span id="motion-indicator">MOTION: ON</span>
+        </button>
+
+        <!-- System Status Pip -->
+        <span class="vnm-status vnm-status-online vnm-pulse" style="margin-left: 6px;">
+          <span class="vnm-status-pip"></span>
+          <span class="vnm-status-label" style="font-size: 11px;">SECURE</span>
+        </span>
+      </div>
+    </header>
+
+    <!-- WORKSPACE BODY (PERSISTENT RAIL + DYNAMIC STAGE) -->
+    <div class="os-workspace-body" id="os-workspace-body">
+
+      <!-- LEFT PERSISTENT NAVIGATION RAIL (ALL 20 SCREENS CLUSTERED) -->
+      <nav class="os-nav-rail" id="os-nav-rail">
+        
+        <!-- CLUSTER 1: CORE OS -->
+        <div class="nav-group-title">01 // CORE PLATFORM</div>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-boot">
+          <span class="nav-icon">⏻</span> <span>01. Boot Sequence</span>
+        </button>
+        <button type="button" class="os-nav-btn active-screen" data-screen-target="screen-command">
+          <span class="nav-icon">◈</span> <span>02. Command Center</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-security">
+          <span class="nav-icon">⛨</span> <span>18. Security Center</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-settings">
+          <span class="nav-icon">⚙</span> <span>19. Settings & Config</span>
+        </button>
+
+        <!-- CLUSTER 2: NEURAL INTELLIGENCE -->
+        <div class="nav-group-title">02 // INTELLIGENCE</div>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-ai-chat">
+          <span class="nav-icon">▶</span> <span>03. AI Neural Stream</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-voice">
+          <span class="nav-icon">◉</span> <span>04. Voice Assistant</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-agents">
+          <span class="nav-icon">⬡</span> <span>05. Agent Manager</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-memory">
+          <span class="nav-icon">◎</span> <span>20. AI Memory & History</span>
+        </button>
+
+        <!-- CLUSTER 3: CREATIVE SUITE -->
+        <div class="nav-group-title">03 // CREATIVE SUITE</div>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-creative">
+          <span class="nav-icon">▦</span> <span>06. Creative Studio</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-video">
+          <span class="nav-icon">◩</span> <span>07. Video Workspace</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-image">
+          <span class="nav-icon">✦</span> <span>08. Image Studio</span>
+        </button>
+
+        <!-- CLUSTER 4: BUSINESS & CRM -->
+        <div class="nav-group-title">04 // BUSINESS & CRM</div>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-crm">
+          <span class="nav-icon">▤</span> <span>09. Business & CRM</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-leads">
+          <span class="nav-icon">⌖</span> <span>10. Client Leads</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-comms">
+          <span class="nav-icon">✉</span> <span>11. Unified Comms</span>
+        </button>
+
+        <!-- CLUSTER 5: MEDIA & GROWTH -->
+        <div class="nav-group-title">05 // MEDIA & GROWTH</div>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-youtube">
+          <span class="nav-icon">▶</span> <span>12. YouTube Manager</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-calendar">
+          <span class="nav-icon">◫</span> <span>13. Content Calendar</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-analytics">
+          <span class="nav-icon">📈</span> <span>14. Analytics Deck</span>
+        </button>
+
+        <!-- CLUSTER 6: SYSTEM UTILITIES -->
+        <div class="nav-group-title">06 // SYSTEM UTILITIES</div>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-files">
+          <span class="nav-icon">📁</span> <span>15. File Explorer</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-automations">
+          <span class="nav-icon">⚡</span> <span>16. Automation Builder</span>
+        </button>
+        <button type="button" class="os-nav-btn" data-screen-target="screen-mobile">
+          <span class="nav-icon">📱</span> <span>17. Mobile Command</span>
+        </button>
+      </nav>
+
+      <!-- MAIN OPERATIONAL STAGE -->
+      <main class="os-stage" id="os-stage">
+        
+        <!-- UNIVERSAL SCREEN STATE SWITCHER (Requirement: Default, Empty, Loading, Error, Success) -->
+        <div class="screen-state-toolbar">
+          <div class="screen-title-area">
+            <span style="color: var(--vnm-crimson-core);">//</span>
+            <span id="current-screen-name">02. MAIN COMMAND CENTER</span>
+          </div>
+
+          <div class="state-switch-pillbox">
+            <button type="button" class="state-switch-btn active-state" data-view-state="operational">Operational</button>
+            <button type="button" class="state-switch-btn" data-view-state="empty">Empty</button>
+            <button type="button" class="state-switch-btn" data-view-state="loading">Loading</button>
+            <button type="button" class="state-switch-btn" data-view-state="error">Error</button>
+            <button type="button" class="state-switch-btn" data-view-state="success">Success</button>
+          </div>
+        </div>
+
+        <!-- CANVAS HOSTING ALL 20 SCREENS -->
+        <div class="screen-canvas" id="screen-canvas">
+
+          <!-- ===============================================================
+               SCREEN 02: MAIN COMMAND CENTER (DEFAULT SCREEN)
+               =============================================================== -->
+          <div class="screen-view active" id="screen-command">
+            
+            <!-- Operational View -->
+            <div class="view-operational">
+              <div class="vnm-grid-24" style="margin-bottom: var(--vnm-sp-5);">
+                <!-- Horizon Datum Summary Banner -->
+                <div class="vnm-col-span-24" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: var(--vnm-sp-4); border-radius: 2px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                      <h2 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-text-specular);">EXECUTIVE COMMAND DECK // ACTIVE WORKSPACE</h2>
+                      <p style="font-size: 13px; color: var(--vnm-text-titanium); margin-top: 2px;">Autonomous Substrate nominal. 5 sub-agents idle, 1 task queue running.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" class="vnm-btn vnm-btn-primary vnm-btn-sm" onclick="showToast('info', 'Agent Spawned', 'Synthesizing task partition.');">
+                        <span>+ SPAWN AGENT</span>
+                      </button>
+                      <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm" onclick="showToast('info', 'Workspace Synced', 'Local buffer refreshed.');">
+                        <span>SYNC WORKSPACE</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Left Column: Active Fleet -->
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-subtle); padding: var(--vnm-sp-4); border-radius: 2px;">
+                  <div class="vnm-card-title" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span class="vnm-mono" style="font-size: 12px; color: var(--vnm-text-specular);">ACTIVE AGENTS (4)</span>
+                    <span class="vnm-badge vnm-badge-emerald">STABLE</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="padding: 10px; background: var(--vnm-surface-elevated); border-left: 2px solid var(--vnm-crimson-core); font-size: 13px;">
+                      <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600;">Architect-01</span>
+                        <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">THREAD #09</span>
+                      </div>
+                      <p style="font-size: 12px; color: var(--vnm-text-titanium); margin-top: 2px;">Analyzing CRM deal stages and lead scores.</p>
+                    </div>
+                    <div style="padding: 10px; background: var(--vnm-surface-elevated); border-left: 2px solid var(--vnm-status-emerald); font-size: 13px;">
+                      <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600;">Sentinel-Audit</span>
+                        <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">THREAD #12</span>
+                      </div>
+                      <p style="font-size: 12px; color: var(--vnm-text-titanium); margin-top: 2px;">Air-gap parity verified. Zero intrusion vectors.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Center Column: Priority Feeds -->
+                <div class="vnm-col-span-16" style="background: var(--vnm-surface-blade); border: var(--vnm-border-subtle); padding: var(--vnm-sp-4); border-radius: 2px;">
+                  <div class="vnm-card-title" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span class="vnm-mono" style="font-size: 12px; color: var(--vnm-text-specular);">EXECUTIVE ACTION MATRIX</span>
+                    <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">3 PENDING DECISIONS</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="padding: 12px; background: var(--vnm-surface-elevated); border: var(--vnm-border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                      <div>
+                        <span class="vnm-badge vnm-badge-crimson" style="margin-bottom: 4px;">VIDEO WORKSPACE</span>
+                        <h4 style="font-size: 14px; font-weight: 600; color: var(--vnm-text-specular);">Review YouTube 4K Master Render</h4>
+                        <p style="font-size: 12px; color: var(--vnm-text-titanium);">AI subtitles generated. Ready for metadata optimization.</p>
+                      </div>
+                      <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm" onclick="navigateToScreen('screen-video');">
+                        <span>OPEN WORKSPACE</span>
+                      </button>
+                    </div>
+                    <div style="padding: 12px; background: var(--vnm-surface-elevated); border: var(--vnm-border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                      <div>
+                        <span class="vnm-badge" style="margin-bottom: 4px;">CRM PIPELINE</span>
+                        <h4 style="font-size: 14px; font-weight: 600; color: var(--vnm-text-specular);">Retainer Agreement Signed ($12,000/mo)</h4>
+                        <p style="font-size: 12px; color: var(--vnm-text-titanium);">Client Apex Corp committed contract terms.</p>
+                      </div>
+                      <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm" onclick="navigateToScreen('screen-crm');">
+                        <span>VIEW CRM</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="view-empty" style="display: none;">
+              <div class="state-card-empty">
+                <div class="state-icon">◈</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-text-specular); margin-bottom: 8px;">Command Center Quiet</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; max-width: 440px; margin-bottom: 20px;">
+                  No active operations or agent pipelines running. Spawn an autonomous worker or select a creative workspace to initialize tasks.
+                </p>
+                <button type="button" class="vnm-btn vnm-btn-primary">
+                  <span>+ INITIALIZE NEW TASK</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="view-loading" style="display: none;">
+              <div style="max-width: 800px; margin: 0 auto;">
+                <div class="skeleton-line" style="height: 32px; width: 60%;"></div>
+                <div class="skeleton-line" style="height: 120px; width: 100%;"></div>
+                <div class="skeleton-line" style="height: 80px; width: 100%;"></div>
+                <div class="skeleton-line" style="height: 80px; width: 100%;"></div>
+              </div>
+            </div>
+
+            <!-- Error State -->
+            <div class="view-error" style="display: none;">
+              <div class="state-card-error">
+                <div class="state-icon">⚠</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-status-danger); margin-bottom: 8px;">Telemetry Buffer Desync [ERR_COMM_0x44]</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; max-width: 440px; margin-bottom: 20px;">
+                  Failed to synchronize thread telemetry from the local daemon. Check memory partitions or re-arm daemon.
+                </p>
+                <button type="button" class="vnm-btn vnm-btn-tactical" onclick="resetToOperational();">
+                  <span>RE-INITIALIZE BUFFER</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Success State -->
+            <div class="view-success" style="display: none;">
+              <div class="state-card-success">
+                <div class="state-icon">✓</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-status-emerald); margin-bottom: 8px;">Executive Directive Committed</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; max-width: 440px; margin-bottom: 20px;">
+                  All 16 background threads completed with zero anomalies. Audit logs signed with local cryptographic key.
+                </p>
+                <button type="button" class="vnm-btn vnm-btn-tactical" onclick="resetToOperational();">
+                  <span>RETURN TO OPERATIONAL VIEW</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 03: AI CONVERSATIONAL INTERFACE
+               =============================================================== -->
+          <div class="screen-view" id="screen-ai-chat">
+            <div class="view-operational">
+              <!-- Reusing ExecutionStream Component -->
+              <div class="vnm-stream-container" style="margin-bottom: var(--vnm-sp-4);">
+                <div class="vnm-preview-disclaimer">
+                  <span>⚡ [NEURAL EXECUTION STREAM // ANOS-01]</span>
+                  <span>MODEL: CLAUDE 3.5 SONNET [LOCAL AIR-GAP PROXY]</span>
+                </div>
+                <div class="vnm-stream-header">
+                  <div class="vnm-stream-title">
+                    <span style="color: var(--vnm-crimson-core);">▶_</span>
+                    <span>TASK: GENERATE_HIGH_CONVERTING_YOUTUBE_HOOKS</span>
+                  </div>
+                  <span class="vnm-badge vnm-badge-emerald">COMPLETED</span>
+                </div>
+                <div class="vnm-stream-body">
+                  <pre class="vnm-command-block"><code>venom-synth --target="Next-Gen AI Operating Systems" --retention-goal="70%"</code></pre>
+                  
+                  <div style="background: var(--vnm-surface-elevated); padding: 14px; border-radius: 2px; border: var(--vnm-border-subtle);">
+                    <h4 style="font-size: 14px; font-weight: 600; color: var(--vnm-text-specular); margin-bottom: 6px;">Synthesized Tactical Output:</h4>
+                    <p style="font-size: 13px; color: var(--vnm-text-titanium); line-height: 1.6;">
+                      Hook Option 1: "Most AI interfaces look like toys. Today we built an operating system designed for human-machine convergence."<br>
+                      Hook Option 2: "Stop using chat bubbles for coding agents. Here is how aerospace telemetry transforms workflow speed."
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Input Dock -->
+              <div style="display: flex; gap: 8px;">
+                <input type="text" class="vnm-input" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 0 16px; height: 42px; border-radius: 2px;" placeholder="Dispatch neural protocol or instruction (e.g., 'Refactor memory tree')..." />
+                <button type="button" class="vnm-btn vnm-btn-primary" style="height: 42px;">EXECUTE [↵]</button>
+              </div>
+            </div>
+
+            <!-- Generic States for AI Chat -->
+            <div class="view-empty" style="display: none;">
+              <div class="state-card-empty">
+                <div class="state-icon">▶_</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-text-specular); margin-bottom: 8px;">Neural Stream Idle</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; max-width: 440px; margin-bottom: 20px;">
+                  No active conversation thread. Type an executive command below or select an agent role to begin streaming.
+                </p>
+              </div>
+            </div>
+            <div class="view-loading" style="display: none;">
+              <div class="state-card-loading">
+                <div class="vnm-status-pip" style="width: 14px; height: 14px; background: var(--vnm-crimson-core); animation: vnm-pulse 1.2s infinite; margin-bottom: 16px;"></div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 16px; color: var(--vnm-text-specular);">Streaming Neural Reasoning...</h3>
+                <p class="vnm-mono" style="font-size: 12px; color: var(--vnm-text-alloy); margin-top: 6px;">[0.42s] Resolving multi-modal semantic constraints</p>
+              </div>
+            </div>
+            <div class="view-error" style="display: none;">
+              <div class="state-card-error">
+                <div class="state-icon">✕</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-status-danger);">API Context Overflow [HTTP 429]</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; max-width: 440px; margin-top: 6px; margin-bottom: 20px;">
+                  Token window exceeded 200,000 tokens. Prune semantic history or switch to local engine.
+                </p>
+                <button type="button" class="vnm-btn vnm-btn-tactical" onclick="resetToOperational();">COMPACT CONTEXT</button>
+              </div>
+            </div>
+            <div class="view-success" style="display: none;">
+              <div class="state-card-success">
+                <div class="state-icon">✓</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-status-emerald);">Code Diff Applied Cleanly</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; max-width: 440px; margin-top: 6px; margin-bottom: 20px;">
+                  Committed 4 files with zero syntax errors. Unit tests passed.
+                </p>
+                <button type="button" class="vnm-btn vnm-btn-tactical" onclick="resetToOperational();">DISMISS</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 04: VOICE ASSISTANT INTERFACE
+               =============================================================== -->
+          <div class="screen-view" id="screen-voice">
+            <div class="view-operational">
+              <div style="text-align: center; padding: var(--vnm-sp-10) 0;">
+                <div class="voice-orb">
+                  <span class="vnm-mono" style="color: #fff; font-weight: 700; font-size: 16px;">LISTENING</span>
+                </div>
+                
+                <div class="audio-frequency-bars">
+                  <div class="freq-bar" style="animation-delay: 0.1s;"></div>
+                  <div class="freq-bar" style="animation-delay: 0.3s;"></div>
+                  <div class="freq-bar" style="animation-delay: 0.15s;"></div>
+                  <div class="freq-bar" style="animation-delay: 0.4s;"></div>
+                  <div class="freq-bar" style="animation-delay: 0.25s;"></div>
+                  <div class="freq-bar" style="animation-delay: 0.5s;"></div>
+                  <div class="freq-bar" style="animation-delay: 0.2s;"></div>
+                  <div class="freq-bar" style="animation-delay: 0.35s;"></div>
+                </div>
+
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-text-specular); margin-bottom: 8px;">
+                  "Venom, check pending client leads and prepare the video script."
+                </h3>
+                <p class="vnm-mono" style="font-size: 12px; color: var(--vnm-status-emerald);">
+                  [CONFIRMED] ROUTING PROTOCOL TO CRM & CREATIVE STUDIO...
+                </p>
+              </div>
+            </div>
+
+            <!-- Generic States -->
+            <div class="view-empty" style="display: none;">
+              <div class="state-card-empty">
+                <div class="state-icon">🎤</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-text-specular);">Microphone Standby</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; margin-top: 6px; margin-bottom: 16px;">Say 'Hey Venom' or click below to activate voice link.</p>
+                <button type="button" class="vnm-btn vnm-btn-primary">START LISTENING</button>
+              </div>
+            </div>
+            <div class="view-loading" style="display: none;">
+              <div class="state-card-loading">
+                <div class="vnm-status-pip" style="background: var(--vnm-status-amber); animation: vnm-pulse 1s infinite; width: 14px; height: 14px; margin-bottom: 16px;"></div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 16px; color: var(--vnm-text-specular);">Synthesizing Acoustic Speech...</h3>
+              </div>
+            </div>
+            <div class="view-error" style="display: none;">
+              <div class="state-card-error">
+                <div class="state-icon">✕</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-status-danger);">Audio Input Device Unavailable</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; margin-top: 6px; margin-bottom: 16px;">No valid microphone stream detected on local hardware.</p>
+                <button type="button" class="vnm-btn vnm-btn-tactical" onclick="resetToOperational();">RETRY AUDIO</button>
+              </div>
+            </div>
+            <div class="view-success" style="display: none;">
+              <div class="state-card-success">
+                <div class="state-icon">✓</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-status-emerald);">Voice Directive Dispatched</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; margin-top: 6px; margin-bottom: 16px;">Directive executed with zero transcription errors.</p>
+                <button type="button" class="vnm-btn vnm-btn-tactical" onclick="resetToOperational();">OK</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 05: AGENT MANAGEMENT CENTER
+               =============================================================== -->
+          <div class="screen-view" id="screen-agents">
+            <div class="view-operational">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-family: var(--vnm-font-display); font-size: 16px; color: var(--vnm-text-specular);">ACTIVE SUB-AGENT FLEET</h3>
+                <button type="button" class="vnm-btn vnm-btn-primary vnm-btn-sm">+ DEPLOY NEW SUB-AGENT</button>
+              </div>
+
+              <div class="vnm-grid-24">
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px; border-radius: 2px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-weight: 600; color: #fff;">Lead Hunter Agent</span>
+                    <span class="vnm-badge vnm-badge-emerald">RUNNING</span>
+                  </div>
+                  <p style="font-size: 12px; color: var(--vnm-text-titanium); margin-bottom: 12px;">Enriching B2B client contacts from inbound webhooks.</p>
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--vnm-text-alloy); font-family: var(--vnm-font-mono);">
+                    <span>PROCESSED: 142 LEADS</span>
+                    <span>SUCCESS: 99.2%</span>
+                  </div>
+                </div>
+
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px; border-radius: 2px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-weight: 600; color: #fff;">YouTube SEO Specialist</span>
+                    <span class="vnm-badge">IDLE</span>
+                  </div>
+                  <p style="font-size: 12px; color: var(--vnm-text-titanium); margin-bottom: 12px;">Optimizing video tags, descriptions, and thumbnail CTR.</p>
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--vnm-text-alloy); font-family: var(--vnm-font-mono);">
+                    <span>LAST RUN: 2H AGO</span>
+                    <span>QUEUE: EMPTY</span>
+                  </div>
+                </div>
+
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px; border-radius: 2px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-weight: 600; color: #fff;">Security Sentinel</span>
+                    <span class="vnm-badge vnm-badge-crimson">ACTIVE GUARD</span>
+                  </div>
+                  <p style="font-size: 12px; color: var(--vnm-text-titanium); margin-bottom: 12px;">Continuous memory partition scan and integrity verification.</p>
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--vnm-text-alloy); font-family: var(--vnm-font-mono);">
+                    <span>INTEGRITY: 100%</span>
+                    <span>AIR-GAP: ON</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Generic States -->
+            <div class="view-empty" style="display: none;">
+              <div class="state-card-empty">
+                <div class="state-icon">⬡</div>
+                <h3 style="font-family: var(--vnm-font-display); font-size: 18px; color: var(--vnm-text-specular);">Zero Agents Deployed</h3>
+                <p style="color: var(--vnm-text-titanium); font-size: 14px; margin-top: 6px; margin-bottom: 16px;">Spawn a specialized sub-agent to automate tasks.</p>
+                <button type="button" class="vnm-btn vnm-btn-primary">+ SPAWN FIRST AGENT</button>
+              </div>
+            </div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Agent Thread Deadlock</h3><p style="margin-top: 6px;">Worker 0x3 failed to release mutex lock.</p></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Agent Deployed Successfully</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 06: CREATIVE STUDIO
+               =============================================================== -->
+          <div class="screen-view" id="screen-creative">
+            <div class="view-operational">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-family: var(--vnm-font-display); font-size: 16px; color: var(--vnm-text-specular);">CREATIVE ASSET VAULT</h3>
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm">IMPORT MEDIA</button>
+                  <button type="button" class="vnm-btn vnm-btn-primary vnm-btn-sm">+ NEW CREATIVE PROJECT</button>
+                </div>
+              </div>
+
+              <div class="vnm-grid-24">
+                <div class="vnm-col-span-6" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px; border-radius: 2px;">
+                  <div style="height: 120px; background: var(--vnm-surface-elevated); border: var(--vnm-border-subtle); display:flex; align-items:center; justify-content:center; color: var(--vnm-text-alloy); font-size: 24px; margin-bottom: 8px;">🎬</div>
+                  <h4 style="font-size: 13px; font-weight: 600; color: #fff;">Venom_Launch_Trailer.mp4</h4>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">4K // 60 FPS // 1.2 GB</span>
+                </div>
+                <div class="vnm-col-span-6" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px; border-radius: 2px;">
+                  <div style="height: 120px; background: var(--vnm-surface-elevated); border: var(--vnm-border-subtle); display:flex; align-items:center; justify-content:center; color: var(--vnm-text-alloy); font-size: 24px; margin-bottom: 8px;">🖼</div>
+                  <h4 style="font-size: 13px; font-weight: 600; color: #fff;">Thumbnail_Variant_A.png</h4>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">3840x2160 // PNG</span>
+                </div>
+                <div class="vnm-col-span-6" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px; border-radius: 2px;">
+                  <div style="height: 120px; background: var(--vnm-surface-elevated); border: var(--vnm-border-subtle); display:flex; align-items:center; justify-content:center; color: var(--vnm-text-alloy); font-size: 24px; margin-bottom: 8px;">🎵</div>
+                  <h4 style="font-size: 13px; font-weight: 600; color: #fff;">Cinematic_Soundtrack.wav</h4>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">24-BIT // 48kHz</span>
+                </div>
+                <div class="vnm-col-span-6" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px; border-radius: 2px;">
+                  <div style="height: 120px; background: var(--vnm-surface-elevated); border: var(--vnm-border-subtle); display:flex; align-items:center; justify-content:center; color: var(--vnm-text-alloy); font-size: 24px; margin-bottom: 8px;">📝</div>
+                  <h4 style="font-size: 13px; font-weight: 600; color: #fff;">Episode_04_Script.md</h4>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">2,400 WORDS</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Generic States -->
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">▦</div><h3>Creative Studio Empty</h3><p style="margin-top: 6px;">No multimedia assets found.</p></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Asset Corrupted</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Media Indexed Cleanly</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 07: VIDEO EDITING WORKSPACE
+               =============================================================== -->
+          <div class="screen-view" id="screen-video">
+            <div class="view-operational">
+              <div class="vnm-grid-24" style="margin-bottom: 16px;">
+                <!-- Preview Monitor -->
+                <div class="vnm-col-span-16" style="background: var(--vnm-obsidian); border: var(--vnm-border-edge); height: 260px; display:flex; flex-direction:column; justify-content:space-between; padding: 12px;">
+                  <div style="display:flex; justify-content:space-between; font-family: var(--vnm-font-mono); font-size: 11px; color: var(--vnm-text-alloy);">
+                    <span>PREVIEW: 00:04:18:12</span>
+                    <span style="color: var(--vnm-crimson-core);">REC // 4K UHD</span>
+                  </div>
+                  <div style="text-align: center; color: var(--vnm-text-alloy); font-size: 32px;">▶</div>
+                  <div style="display:flex; gap: 8px; justify-content:center;">
+                    <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm">⏮</button>
+                    <button type="button" class="vnm-btn vnm-btn-primary vnm-btn-sm">PLAY / PAUSE</button>
+                    <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm">⏭</button>
+                  </div>
+                </div>
+
+                <!-- Inspector / AI Color Grading -->
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px;">
+                  <h4 style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 12px;">CLIP PROPERTIES</h4>
+                  <div class="vnm-input-group" style="margin-bottom: 12px;">
+                    <label class="vnm-label">AI Color Grade LUT</label>
+                    <div class="vnm-input-wrapper"><input type="text" class="vnm-input" value="Obsidian_SciFi_Cinema.cube" readonly /></div>
+                  </div>
+                  <div class="vnm-input-group">
+                    <label class="vnm-label">Audio Speech Enhancement</label>
+                    <div class="vnm-input-wrapper"><input type="text" class="vnm-input" value="Active (Voice Isolation 95%)" readonly /></div>
+                  </div>
+                </div>
+
+                <!-- Multi-Track Timeline -->
+                <div class="vnm-col-span-24" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px; border-radius: 2px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy); display:block; margin-bottom: 8px;">MULTI-TRACK SEQUENCE</span>
+                  <div style="background: var(--vnm-surface-elevated); height: 28px; margin-bottom: 4px; display:flex; align-items:center; padding: 0 12px; font-family: var(--vnm-font-mono); font-size: 11px; color: var(--vnm-text-titanium);">
+                    <span style="color: var(--vnm-crimson-core); margin-right: 8px;">[V1]</span> Master_B-Roll_A01.mp4
+                  </div>
+                  <div style="background: var(--vnm-surface-elevated); height: 28px; margin-bottom: 4px; display:flex; align-items:center; padding: 0 12px; font-family: var(--vnm-font-mono); font-size: 11px; color: var(--vnm-text-titanium);">
+                    <span style="color: var(--vnm-status-cyan); margin-right: 8px;">[A1]</span> Dialogue_Cleaned_Vocals.wav
+                  </div>
+                  <div style="background: var(--vnm-surface-elevated); height: 28px; display:flex; align-items:center; padding: 0 12px; font-family: var(--vnm-font-mono); font-size: 11px; color: var(--vnm-text-titanium);">
+                    <span style="color: var(--vnm-status-emerald); margin-right: 8px;">[AI]</span> Subtitles_Synchronized_Track
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Generic States -->
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">◩</div><h3>Timeline Empty</h3><p style="margin-top: 6px;">Drop video or audio media onto the sequence track.</p></div></div>
+            <div class="view-loading" style="display: none;"><div class="state-card-loading"><h3>Rendering 4K Sequence...</h3></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Render Pipeline Failed</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Export Completed [4K UHD]</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 08: IMAGE GENERATION WORKSPACE
+               =============================================================== -->
+          <div class="screen-view" id="screen-image">
+            <div class="view-operational">
+              <div class="vnm-grid-24">
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px;">
+                  <h4 style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 12px;">SYNTHESIS PARAMETERS</h4>
+                  <div class="vnm-input-group" style="margin-bottom: 12px;">
+                    <label class="vnm-label">Prompt</label>
+                    <div class="vnm-input-wrapper">
+                      <input type="text" class="vnm-input" value="Futuristic aerospace UI terminal, obsidian graphite crimson details, 8k" />
+                    </div>
+                  </div>
+                  <div class="vnm-input-group" style="margin-bottom: 12px;">
+                    <label class="vnm-label">Aspect Ratio</label>
+                    <div style="display:flex; gap: 6px;">
+                      <button type="button" class="vnm-btn vnm-btn-primary vnm-btn-sm" style="flex:1;">16:9</button>
+                      <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm" style="flex:1;">1:1</button>
+                      <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm" style="flex:1;">9:16</button>
+                    </div>
+                  </div>
+                  <button type="button" class="vnm-btn vnm-btn-primary" style="width: 100%; margin-top: 8px;">
+                    <span>SYNTHESIZE ARTIFACT</span>
+                  </button>
+                </div>
+
+                <div class="vnm-col-span-16" style="background: var(--vnm-obsidian); border: var(--vnm-border-edge); height: 320px; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+                  <div style="font-size: 48px; color: var(--vnm-crimson-core); margin-bottom: 12px;">✦</div>
+                  <span style="font-family: var(--vnm-font-display); font-size: 15px; color: #fff;">High-Fidelity Neural Canvas</span>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy); margin-top: 4px;">Ready for multi-pass diffusion synthesis</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">✦</div><h3>No Generated Artifacts</h3></div></div>
+            <div class="view-loading" style="display: none;"><div class="state-card-loading"><h3>Diffusion Sampling: Step 18/30...</h3></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>GPU VRAM Allocation Limit Reached</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Image Synthesized in 4K</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 09: BUSINESS & CRM CENTER
+               =============================================================== -->
+          <div class="screen-view" id="screen-crm">
+            <div class="view-operational">
+              <!-- KPI Metric Strip -->
+              <div class="vnm-grid-24" style="margin-bottom: 16px;">
+                <div class="vnm-col-span-6" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">MONTHLY REVENUE</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 22px; color: #fff; margin-top: 4px;">$48,500</h3>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-status-emerald);">+18.4% MoM</span>
+                </div>
+                <div class="vnm-col-span-6" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">ACTIVE RETAINERS</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 22px; color: #fff; margin-top: 4px;">12 CLIENTS</h3>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-status-emerald);">100% RETENTION</span>
+                </div>
+                <div class="vnm-col-span-6" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">OPEN PIPELINE</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 22px; color: #fff; margin-top: 4px;">$94,000</h3>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-titanium);">6 DEALS</span>
+                </div>
+                <div class="vnm-col-span-6" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">CONVERSION VELOCITY</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 22px; color: #fff; margin-top: 4px;">14 DAYS</h3>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-status-emerald);">-3 DAYS FASTER</span>
+                </div>
+              </div>
+
+              <!-- Kanban Deal Stages -->
+              <div class="vnm-grid-24">
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-subtle); padding: 12px;">
+                  <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 13px;">Proposal Sent (2)</span>
+                    <span class="vnm-badge">$32,000</span>
+                  </div>
+                  <div style="background: var(--vnm-surface-elevated); padding: 10px; margin-bottom: 6px;">
+                    <div style="font-weight: 600; color: #fff; font-size: 13px;">Apex AI Infrastructure</div>
+                    <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">$20,000 // Retainer</span>
+                  </div>
+                </div>
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-subtle); padding: 12px;">
+                  <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 13px;">Negotiation (1)</span>
+                    <span class="vnm-badge vnm-badge-crimson">$45,000</span>
+                  </div>
+                  <div style="background: var(--vnm-surface-elevated); padding: 10px;">
+                    <div style="font-weight: 600; color: #fff; font-size: 13px;">HyperScale Media Corp</div>
+                    <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">$45,000 // Custom Stack</span>
+                  </div>
+                </div>
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-subtle); padding: 12px;">
+                  <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 13px;">Closed Won (3)</span>
+                    <span class="vnm-badge vnm-badge-emerald">$17,000</span>
+                  </div>
+                  <div style="background: var(--vnm-surface-elevated); padding: 10px;">
+                    <div style="font-weight: 600; color: #fff; font-size: 13px;">Neural Labs GmbH</div>
+                    <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-status-emerald);">PAID // CONTRACT SIGNED</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">▤</div><h3>Pipeline Empty</h3><p style="margin-top: 6px;">No deals currently in CRM stages.</p></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 120px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Payment Webhook Error</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Deal Closed Won</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 10: CLIENT LEAD MANAGEMENT
+               =============================================================== -->
+          <div class="screen-view" id="screen-leads">
+            <div class="view-operational">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-family: var(--vnm-font-display); font-size: 16px; color: var(--vnm-text-specular);">INBOUND LEADS DIRECTORY</h3>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" class="vnm-input" style="width: 220px; height: 34px; background: var(--vnm-surface-blade); border: var(--vnm-border-edge);" placeholder="Search leads..." />
+                  <button type="button" class="vnm-btn vnm-btn-primary vnm-btn-sm">+ ADD LEAD</button>
+                </div>
+              </div>
+
+              <div style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); border-radius: 2px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--vnm-text-alloy); font-family: var(--vnm-font-mono); font-size: 11px; text-align: left;">
+                      <th style="padding: 10px;">LEAD NAME</th>
+                      <th style="padding: 10px;">COMPANY</th>
+                      <th style="padding: 10px;">SCORE</th>
+                      <th style="padding: 10px;">SOURCE</th>
+                      <th style="padding: 10px;">STATUS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                      <td style="padding: 12px; font-weight: 600; color: #fff;">Marcus Vance</td>
+                      <td style="padding: 12px; color: var(--vnm-text-titanium);">Vance Robotics Corp</td>
+                      <td style="padding: 12px;"><span class="vnm-badge vnm-badge-crimson">98/100</span></td>
+                      <td style="padding: 12px; font-family: var(--vnm-font-mono); font-size: 11px;">Inbound Form</td>
+                      <td style="padding: 12px;"><span class="vnm-status vnm-status-online"><span class="vnm-status-pip"></span>Hot Lead</span></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                      <td style="padding: 12px; font-weight: 600; color: #fff;">Elena Rostova</td>
+                      <td style="padding: 12px; color: var(--vnm-text-titanium);">Quantum Synthetics</td>
+                      <td style="padding: 12px;"><span class="vnm-badge vnm-badge-emerald">88/100</span></td>
+                      <td style="padding: 12px; font-family: var(--vnm-font-mono); font-size: 11px;">LinkedIn Outreach</td>
+                      <td style="padding: 12px;"><span class="vnm-status vnm-status-busy"><span class="vnm-status-pip"></span>Meeting Set</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">⌖</div><h3>No Inbound Leads</h3></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Lead Enrichment Failed</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Lead Converted to Deal</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 11: EMAIL & COMMUNICATION CENTER
+               =============================================================== -->
+          <div class="screen-view" id="screen-comms">
+            <div class="view-operational">
+              <div class="vnm-grid-24">
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy); display:block; margin-bottom: 8px;">UNIFIED INBOX (3)</span>
+                  <div style="padding: 10px; background: var(--vnm-surface-elevated); border-left: 2px solid var(--vnm-crimson-core); margin-bottom: 6px;">
+                    <div style="font-weight: 600; color: #fff; font-size: 13px;">Apex Corp // Contract Approval</div>
+                    <p style="font-size: 12px; color: var(--vnm-text-titanium); margin-top: 2px;">"We have signed the terms. Let's schedule the kickoff."</p>
+                  </div>
+                  <div style="padding: 10px; background: var(--vnm-surface-elevated); border-left: 2px solid transparent;">
+                    <div style="font-weight: 600; color: #fff; font-size: 13px;">YouTube Creator Support</div>
+                    <p style="font-size: 12px; color: var(--vnm-text-titanium); margin-top: 2px;">"Your channel milestone certificate is ready."</p>
+                  </div>
+                </div>
+
+                <div class="vnm-col-span-16" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px;">
+                  <div style="border-bottom: var(--vnm-border-subtle); padding-bottom: 12px; margin-bottom: 12px;">
+                    <h4 style="font-size: 15px; font-weight: 600; color: #fff;">Apex Corp // Contract Approval</h4>
+                    <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">From: legal@apexcorp.ai // Received: Today 14:22 UTC</span>
+                  </div>
+                  <p style="font-size: 13px; color: var(--vnm-text-titanium); line-height: 1.6; margin-bottom: 16px;">
+                    Hi Venom Architecture Team,<br><br>
+                    We reviewed the autonomous operating system agreement and committed the signed PDF to the portal. We are ready to proceed with the neural integration next Monday.
+                  </p>
+                  <div style="display:flex; gap: 8px;">
+                    <button type="button" class="vnm-btn vnm-btn-primary vnm-btn-sm">AI DRAFT REPLY [AUTONOMOUS]</button>
+                    <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm">SCHEDULE CALL</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">✉</div><h3>Inbox Zero</h3><p style="margin-top: 6px;">All communications triaged and resolved.</p></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>SMTP Relay Timeout</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Message Sent (Undo 8s)</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 12: YOUTUBE CHANNEL MANAGER
+               =============================================================== -->
+          <div class="screen-view" id="screen-youtube">
+            <div class="view-operational">
+              <div class="vnm-grid-24" style="margin-bottom: 16px;">
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">CHANNEL SUBSCRIBERS</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 22px; color: #fff; margin-top: 4px;">128,400</h3>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-status-emerald);">+4,200 This Week</span>
+                </div>
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">28-DAY VIEWS</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 22px; color: #fff; margin-top: 4px;">1,420,800</h3>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-status-emerald);">CTR: 11.4% (Top Tier)</span>
+                </div>
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">ESTIMATED REVENUE</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 22px; color: #fff; margin-top: 4px;">$14,280</h3>
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-status-emerald);">RPM: $10.05</span>
+                </div>
+              </div>
+
+              <div style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px;">
+                <h4 style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 12px;">LATEST PUBLISHED VIDEOS</h4>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px; background: var(--vnm-surface-elevated); margin-bottom: 6px;">
+                  <div>
+                    <span style="font-weight: 600; color: #fff;">Why AI Operating Systems Will Replace Chat Wrappers</span>
+                    <p class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy); margin-top: 2px;">Views: 420K // CTR: 12.8% // Retention: 68%</p>
+                  </div>
+                  <span class="vnm-badge vnm-badge-emerald">MONETIZED</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">▶</div><h3>No Videos Published</h3></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>YouTube API Quota Exceeded</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Video Metadata Published</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 13: CONTENT CALENDAR
+               =============================================================== -->
+          <div class="screen-view" id="screen-calendar">
+            <div class="view-operational">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                <h3 style="font-family: var(--vnm-font-display); font-size: 16px; color: var(--vnm-text-specular);">EDITORIAL RELEASE CALENDAR</h3>
+                <div style="display:flex; gap: 6px;">
+                  <button type="button" class="vnm-btn vnm-btn-primary vnm-btn-sm">MONTH</button>
+                  <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm">WEEK</button>
+                  <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm">+ SCHEDULE DROP</button>
+                </div>
+              </div>
+
+              <div class="vnm-grid-24" style="gap: 8px;">
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-crimson-core);">MONDAY // NOV 09</span>
+                  <div style="background: var(--vnm-surface-elevated); padding: 8px; margin-top: 6px;">
+                    <span class="vnm-badge vnm-badge-crimson">YOUTUBE</span>
+                    <p style="font-size: 12px; color: #fff; margin-top: 4px;">Launch Trailer Video Drop</p>
+                  </div>
+                </div>
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">WEDNESDAY // NOV 11</span>
+                  <div style="background: var(--vnm-surface-elevated); padding: 8px; margin-top: 6px;">
+                    <span class="vnm-badge">X THREAD</span>
+                    <p style="font-size: 12px; color: #fff; margin-top: 4px;">Technical Architecture Breakdown</p>
+                  </div>
+                </div>
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">FRIDAY // NOV 13</span>
+                  <div style="background: var(--vnm-surface-elevated); padding: 8px; margin-top: 6px;">
+                    <span class="vnm-badge vnm-badge-emerald">NEWSLETTER</span>
+                    <p style="font-size: 12px; color: #fff; margin-top: 4px;">Issue #42: Autonomous ANOS Design</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">◫</div><h3>Calendar Clean</h3><p style="margin-top: 6px;">No upcoming releases scheduled.</p></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Scheduling Conflict Detected</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Post Scheduled for Nov 09</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 14: ANALYTICS DASHBOARD
+               =============================================================== -->
+          <div class="screen-view" id="screen-analytics">
+            <div class="view-operational">
+              <div class="vnm-grid-24" style="margin-bottom: 16px;">
+                <div class="vnm-col-span-16" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">CROSS-SYSTEM ENGAGEMENT VELOCITY</span>
+                  <div style="height: 180px; display:flex; align-items:flex-end; gap: 8px; padding-top: 20px;">
+                    <div style="flex:1; background: var(--vnm-surface-elevated); height: 40%;"></div>
+                    <div style="flex:1; background: var(--vnm-surface-elevated); height: 55%;"></div>
+                    <div style="flex:1; background: var(--vnm-surface-elevated); height: 70%;"></div>
+                    <div style="flex:1; background: var(--vnm-surface-elevated); height: 60%;"></div>
+                    <div style="flex:1; background: var(--vnm-crimson-core); height: 95%; box-shadow: 0 0 12px rgba(224,17,58,0.5);"></div>
+                  </div>
+                </div>
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">CONVERSION FUNNEL</span>
+                  <div style="display:flex; flex-direction:column; gap: 8px; margin-top: 12px;">
+                    <div style="font-size: 12px; color: #fff;">Impressions: 1,420,000</div>
+                    <div style="font-size: 12px; color: #fff;">Website Clicks: 84,200 (5.9%)</div>
+                    <div style="font-size: 12px; color: #fff;">Qualified Leads: 1,240 (1.47%)</div>
+                    <div style="font-size: 12px; color: var(--vnm-status-emerald); font-weight:600;">Closed Deals: 42 (3.3%)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">📈</div><h3>No Analytics Telemetry</h3></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Analytics Ingestion Disconnected</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Report Exported to PDF</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 15: FILE MANAGER
+               =============================================================== -->
+          <div class="screen-view" id="screen-files">
+            <div class="view-operational">
+              <div class="vnm-grid-24">
+                <div class="vnm-col-span-6" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy); display:block; margin-bottom: 8px;">DIRECTORIES</span>
+                  <div style="display:flex; flex-direction:column; gap: 4px; font-size: 12px;">
+                    <div style="color: var(--vnm-crimson-core); font-weight:600;">📁 /system_core</div>
+                    <div style="color: var(--vnm-text-titanium);">📁 /media_vault</div>
+                    <div style="color: var(--vnm-text-titanium);">📁 /outputs</div>
+                    <div style="color: var(--vnm-text-titanium);">📁 /quarantine</div>
+                  </div>
+                </div>
+
+                <div class="vnm-col-span-18" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 12px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy); display:block; margin-bottom: 8px;">FILES IN /system_core</span>
+                  <div style="display:flex; flex-direction:column; gap: 4px;">
+                    <div style="padding: 8px; background: var(--vnm-surface-elevated); display:flex; justify-content:space-between; font-size: 12px;">
+                      <span style="font-weight:600; color:#fff;">kernel_anos_01.bin</span>
+                      <span class="vnm-mono" style="color: var(--vnm-text-alloy);">64 MB // SHA256 VERIFIED</span>
+                    </div>
+                    <div style="padding: 8px; background: var(--vnm-surface-elevated); display:flex; justify-content:space-between; font-size: 12px;">
+                      <span style="font-weight:600; color:#fff;">tokens.css</span>
+                      <span class="vnm-mono" style="color: var(--vnm-text-alloy);">12 KB // CSS ROOT</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">📁</div><h3>Directory Empty</h3></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Read Permission Denied</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>File Shuffled to Vault</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 16: AUTOMATION WORKFLOW BUILDER
+               =============================================================== -->
+          <div class="screen-view" id="screen-automations">
+            <div class="view-operational">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                <h3 style="font-family: var(--vnm-font-display); font-size: 16px; color: var(--vnm-text-specular);">VISUAL AUTOMATION PIPELINE (DAG)</h3>
+                <button type="button" class="vnm-btn vnm-btn-primary vnm-btn-sm">RUN SIMULATION</button>
+              </div>
+
+              <div style="background: var(--vnm-obsidian); border: var(--vnm-border-edge); height: 260px; border-radius: 2px; padding: 20px; display:flex; align-items:center; justify-content:center; gap: 24px;">
+                <div style="background: var(--vnm-surface-blade); border: var(--vnm-border-bright); padding: 12px; border-radius: 2px; text-align:center;">
+                  <span class="vnm-badge">TRIGGER</span>
+                  <p style="font-size: 12px; color:#fff; margin-top: 4px;">Inbound Lead Form</p>
+                </div>
+                <span style="color: var(--vnm-crimson-core); font-size: 20px;">➔</span>
+                <div style="background: var(--vnm-surface-blade); border: var(--vnm-border-bright); padding: 12px; border-radius: 2px; text-align:center;">
+                  <span class="vnm-badge vnm-badge-crimson">AI EVALUATOR</span>
+                  <p style="font-size: 12px; color:#fff; margin-top: 4px;">Score Lead &gt; 80</p>
+                </div>
+                <span style="color: var(--vnm-crimson-core); font-size: 20px;">➔</span>
+                <div style="background: var(--vnm-surface-blade); border: var(--vnm-border-bright); padding: 12px; border-radius: 2px; text-align:center;">
+                  <span class="vnm-badge vnm-badge-emerald">ACTION</span>
+                  <p style="font-size: 12px; color:#fff; margin-top: 4px;">Dispatch Calendar Invite</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">⚡</div><h3>Canvas Blank</h3><p style="margin-top: 6px;">Drag nodes onto the canvas to create workflows.</p></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Circular Pipeline Dependency</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Workflow Deployed Live</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 17: MOBILE COMMAND CENTER
+               =============================================================== -->
+          <div class="screen-view" id="screen-mobile">
+            <div class="view-operational">
+              <div style="max-width: 400px; margin: 0 auto; background: var(--vnm-obsidian); border: var(--vnm-border-bright); border-radius: 6px; padding: 16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                  <span class="vnm-mono" style="font-size: 12px; font-weight:700; color:#fff;">VENOM MOBILE COMPANION</span>
+                  <span class="vnm-status vnm-status-online"><span class="vnm-status-pip"></span>SYNCED</span>
+                </div>
+
+                <div style="background: var(--vnm-surface-blade); padding: 16px; border-radius: 4px; text-align:center; margin-bottom: 12px;">
+                  <span style="font-size: 28px;">🎙</span>
+                  <h4 style="font-size: 14px; font-weight:600; color:#fff; margin-top: 4px;">Tap for Instant Voice Dispatch</h4>
+                  <p style="font-size: 11px; color: var(--vnm-text-alloy);">Connected to Workstation ANOS-01</p>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap: 8px;">
+                  <button type="button" class="vnm-btn vnm-btn-primary" style="height: 44px; width:100%;">
+                    <span>PAUSE ALL AGENTS (EMERGENCY)</span>
+                  </button>
+                  <button type="button" class="vnm-btn vnm-btn-tactical" style="height: 44px; width:100%;">
+                    <span>CHECK INBOX NOTIFICATIONS</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">📱</div><h3>No Mobile Alerts</h3></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Connection Dropped</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Command Transmitted to PC</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 18: SECURITY CENTER
+               =============================================================== -->
+          <div class="screen-view" id="screen-security">
+            <div class="view-operational">
+              <div class="vnm-grid-24" style="margin-bottom: 16px;">
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">AIR-GAP INTEGRITY</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 20px; color: var(--vnm-status-emerald); margin-top: 4px;">SECURE // LOCKED</h3>
+                </div>
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">ENCRYPTION STANDARD</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 20px; color: #fff; margin-top: 4px;">AES-256-GCM</h3>
+                </div>
+                <div class="vnm-col-span-8" style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 14px;">
+                  <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">FAILED ATTEMPTS</span>
+                  <h3 style="font-family: var(--vnm-font-mono); font-size: 20px; color: #fff; margin-top: 4px;">0 DETECTED</h3>
+                </div>
+              </div>
+
+              <div style="background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 16px;">
+                <h4 style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 12px;">AUDIT TRAIL LOG</h4>
+                <div style="display:flex; justify-content:space-between; padding: 8px; background: var(--vnm-surface-elevated); margin-bottom: 4px; font-size: 12px;">
+                  <span class="vnm-mono" style="color: var(--vnm-status-emerald);">[PASSKEY VERIFIED]</span>
+                  <span style="color: var(--vnm-text-titanium);">Local biometric handshake</span>
+                  <span class="vnm-mono" style="color: var(--vnm-text-alloy);">16:24:12 UTC</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">⛨</div><h3>Audit Log Blank</h3></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Intrusion Anomaly Flagged</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Keys Rotated & Vaulted</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 19: SETTINGS & PREFERENCES
+               =============================================================== -->
+          <div class="screen-view" id="screen-settings">
+            <div class="view-operational">
+              <div style="max-width: 640px; margin: 0 auto; background: var(--vnm-surface-blade); border: var(--vnm-border-edge); padding: 20px;">
+                <h3 style="font-family: var(--vnm-font-display); font-size: 16px; color: #fff; margin-bottom: 16px;">SYSTEM CONFIGURATION</h3>
+                
+                <div class="vnm-input-group" style="margin-bottom: 14px;">
+                  <label class="vnm-label">Local Compute Routing</label>
+                  <div class="vnm-input-wrapper"><input type="text" class="vnm-input" value="Primary: Local NPU // Fallback: Air-Gapped API" readonly /></div>
+                </div>
+
+                <div class="vnm-input-group" style="margin-bottom: 14px;">
+                  <label class="vnm-label">Specular Highlight Saturation</label>
+                  <div class="vnm-input-wrapper"><input type="text" class="vnm-input" value="Obsidian Deep Contrast (Standard)" readonly /></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-top: 12px; border-top: var(--vnm-border-subtle);">
+                  <button type="button" class="vnm-btn vnm-btn-ghost vnm-btn-sm">RESET DEFAULTS</button>
+                  <button type="button" class="vnm-btn vnm-btn-primary">SAVE PREFERENCES</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">⚙</div><h3>No Custom Overrides</h3></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Config File Write Error</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Settings Saved Globally</h3></div></div>
+          </div>
+
+          <!-- ===============================================================
+               SCREEN 20: AI MEMORY & ACTIVITY HISTORY
+               =============================================================== -->
+          <div class="screen-view" id="screen-memory">
+            <div class="view-operational">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                <h3 style="font-family: var(--vnm-font-display); font-size: 16px; color: var(--vnm-text-specular);">SEMANTIC MEMORY PARTITIONS</h3>
+                <button type="button" class="vnm-btn vnm-btn-tactical vnm-btn-sm">WIPE SESSION MEMORY</button>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap: 8px;">
+                <div style="padding: 12px; background: var(--vnm-surface-blade); border: var(--vnm-border-edge); display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <span class="vnm-badge">PREFERENCE</span>
+                    <h4 style="font-size: 13px; font-weight:600; color:#fff; margin-top: 4px;">User prefers 16:9 video resolutions and obsidian black surfaces</h4>
+                    <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">Weight: 0.98 // Indexed: Yesterday</span>
+                  </div>
+                  <button type="button" class="vnm-btn vnm-btn-ghost vnm-btn-sm" style="color: var(--vnm-status-danger);">FORGET</button>
+                </div>
+
+                <div style="padding: 12px; background: var(--vnm-surface-blade); border: var(--vnm-border-edge); display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <span class="vnm-badge vnm-badge-crimson">CLIENT ENTITY</span>
+                    <h4 style="font-size: 13px; font-weight:600; color:#fff; margin-top: 4px;">Apex Corp retainer is $12,000/mo payable on the 1st</h4>
+                    <span class="vnm-mono" style="font-size: 11px; color: var(--vnm-text-alloy);">Weight: 0.99 // Indexed: Today</span>
+                  </div>
+                  <button type="button" class="vnm-btn vnm-btn-ghost vnm-btn-sm" style="color: var(--vnm-status-danger);">FORGET</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="view-empty" style="display: none;"><div class="state-card-empty"><div class="state-icon">◎</div><h3>Semantic Memory Blank</h3></div></div>
+            <div class="view-loading" style="display: none;"><div class="skeleton-line" style="height: 100px;"></div></div>
+            <div class="view-error" style="display: none;"><div class="state-card-error"><div class="state-icon">✕</div><h3>Vector Index Corrupted</h3></div></div>
+            <div class="view-success" style="display: none;"><div class="state-card-success"><div class="state-icon">✓</div><h3>Memory Node Purged</h3></div></div>
+          </div>
+
+          <!-- SCREEN 01 DIRECT ALIAS (ALLOWS NAVIGATING TO BOOT SCREEN FROM MENU) -->
+          <div class="screen-view" id="screen-boot">
+            <div class="view-operational" style="text-align: center; padding: 40px 0;">
+              <h3 style="font-family: var(--vnm-font-display); font-size: 20px; color: #fff; margin-bottom: 8px;">BOOT SEQUENCE SIMULATOR</h3>
+              <p style="color: var(--vnm-text-titanium); font-size: 14px; margin-bottom: 20px;">Click below to trigger the cinematic hardware initialization sequence.</p>
+              <button type="button" class="vnm-btn vnm-btn-primary" id="btn-retrigger-boot">TRIGGER CINEMATIC BOOT</button>
+            </div>
+            <div class="view-empty" style="display:none;"><div class="state-card-empty"><h3>No Boot Logs</h3></div></div>
+            <div class="view-loading" style="display:none;"><div class="skeleton-line" style="height:100px;"></div></div>
+            <div class="view-error" style="display:none;"><div class="state-card-error"><h3>Boot Mismatch</h3></div></div>
+            <div class="view-success" style="display:none;"><div class="state-card-success"><h3>Boot Parity Verified</h3></div></div>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="vnm-notification-container" id="os-toasts" aria-live="polite"></div>
+
+  <!-- COMMAND PALETTE (CTRL+K) -->
+  <div class="vnm-command-backdrop" id="os-cmd-modal" role="dialog" aria-modal="true">
+    <div class="vnm-command-panel">
+      <div class="vnm-command-input-box">
+        <span style="color: var(--vnm-crimson-core); margin-right: 12px; font-family: var(--vnm-font-mono);">▶_</span>
+        <input type="text" class="vnm-command-input" id="os-cmd-search" placeholder="Type a screen or command (e.g., 'Video', 'CRM', 'Agents')..." />
+        <span class="vnm-command-shortcut">ESC</span>
+      </div>
+      <ul class="vnm-command-list" id="os-cmd-options">
+        <li class="vnm-command-item" data-goto="screen-command"><span>02. Main Command Center</span><span class="vnm-command-shortcut">G C</span></li>
+        <li class="vnm-command-item" data-goto="screen-ai-chat"><span>03. AI Conversational Stream</span><span class="vnm-command-shortcut">G A</span></li>
+        <li class="vnm-command-item" data-goto="screen-voice"><span>04. Voice Assistant</span><span class="vnm-command-shortcut">G V</span></li>
+        <li class="vnm-command-item" data-goto="screen-agents"><span>05. Agent Management</span><span class="vnm-command-shortcut">G M</span></li>
+        <li class="vnm-command-item" data-goto="screen-video"><span>07. Video Editing Workspace</span><span class="vnm-command-shortcut">G E</span></li>
+        <li class="vnm-command-item" data-goto="screen-crm"><span>09. Business & CRM Center</span><span class="vnm-command-shortcut">G B</span></li>
+        <li class="vnm-command-item" data-goto="screen-security"><span>18. Security Center</span><span class="vnm-command-shortcut">G S</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT CONTROLLERS -->
+  <script>
+    // 1. Toast Notification Helper
+    const toastArea = document.getElementById('os-toasts');
+    function showToast(type, title, msg) {
+      const t = document.createElement('div');
+      t.className = `vnm-notification vnm-notification-${type}`;
+      t.innerHTML = `
+        <div class="vnm-notification-content">
+          <h4 class="vnm-notification-title">${title}</h4>
+          <p class="vnm-notification-message">${msg}</p>
+        </div>
+        <button type="button" class="vnm-notification-close" aria-label="Dismiss">&times;</button>
+      `;
+      toastArea.appendChild(t);
+      t.querySelector('.vnm-notification-close').onclick = () => t.remove();
+      setTimeout(() => { if (t.parentElement) t.remove(); }, 3500);
+    }
+
+    // 2. Cinematic Boot Sequence Controls
+    const bootOverlay = document.getElementById('boot-screen');
+    const enterBtn = document.getElementById('btn-enter-os');
+    const skipBtn = document.getElementById('btn-skip-boot');
+
+    function dismissBoot() {
+      bootOverlay.classList.add('boot-finished');
+    }
+
+    enterBtn.onclick = dismissBoot;
+    skipBtn.onclick = dismissBoot;
+
+    document.getElementById('btn-retrigger-boot').onclick = () => {
+      bootOverlay.classList.remove('boot-finished');
+    };
+
+    // Auto dismiss boot sequence after 3.2s simulation unless cancelled
+    setTimeout(dismissBoot, 3200);
+
+    // 3. Screen Navigation
+    const navButtons = document.querySelectorAll('.os-nav-btn');
+    const screenViews = document.querySelectorAll('.screen-view');
+    const screenTitle = document.getElementById('current-screen-name');
+
+    function navigateToScreen(targetId) {
+      screenViews.forEach(v => v.classList.remove('active'));
+      navButtons.forEach(b => b.classList.remove('active-screen'));
+
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.classList.add('active');
+        const btn = document.querySelector(`[data-screen-target="${targetId}"]`);
+        if (btn) {
+          btn.classList.add('active-screen');
+          screenTitle.textContent = btn.textContent.trim().toUpperCase();
+        }
+      }
+      resetToOperational();
+    }
+
+    navButtons.forEach(btn => {
+      btn.onclick = () => {
+        const targetId = btn.getAttribute('data-screen-target');
+        navigateToScreen(targetId);
+      };
+    });
+
+    // 4. Screen State Switcher (Operational, Empty, Loading, Error, Success)
+    const stateButtons = document.querySelectorAll('.state-switch-btn');
+
+    function resetToOperational() {
+      setViewState('operational');
+    }
+
+    function setViewState(stateName) {
+      stateButtons.forEach(b => b.classList.remove('active-state'));
+      const activeStateBtn = document.querySelector(`[data-view-state="${stateName}"]`);
+      if (activeStateBtn) activeStateBtn.classList.add('active-state');
+
+      const activeScreen = document.querySelector('.screen-view.active');
+      if (!activeScreen) return;
+
+      const views = ['operational', 'empty', 'loading', 'error', 'success'];
+      views.forEach(v => {
+        const el = activeScreen.querySelector(`.view-${v}`);
+        if (el) el.style.display = (v === stateName) ? 'block' : 'none';
+      });
+    }
+
+    stateButtons.forEach(btn => {
+      btn.onclick = () => {
+        const state = btn.getAttribute('data-view-state');
+        setViewState(state);
+      };
+    });
+
+    // 5. Responsive Switcher (Desktop 100%, Laptop, Tablet, Mobile)
+    const toggleRespBtn = document.getElementById('btn-toggle-responsive');
+    const vpLabel = document.getElementById('vp-label');
+    const stage = document.getElementById('os-stage');
+    const modes = [
+      { name: 'DESKTOP (100%)', width: '100%' },
+      { name: 'LAPTOP (1024px)', width: '1024px' },
+      { name: 'TABLET (768px)', width: '768px' },
+      { name: 'MOBILE (420px)', width: '420px' }
+    ];
+    let modeIndex = 0;
+
+    toggleRespBtn.onclick = () => {
+      modeIndex = (modeIndex + 1) % modes.length;
+      vpLabel.textContent = modes[modeIndex].name;
+      stage.style.maxWidth = modes[modeIndex].width;
+      stage.style.margin = '0 auto';
+    };
+
+    // 6. Reduced Motion Toggle
+    let reducedMotion = false;
+    const motionBtn = document.getElementById('btn-motion-toggle');
+    const motionInd = document.getElementById('motion-indicator');
+
+    motionBtn.onclick = () => {
+      reducedMotion = !reducedMotion;
+      if (reducedMotion) {
+        document.documentElement.style.setProperty('--vnm-duration-micro', '0ms');
+        document.documentElement.style.setProperty('--vnm-duration-fast', '0ms');
+        document.documentElement.style.setProperty('--vnm-duration-nominal', '0ms');
+        document.documentElement.style.setProperty('--vnm-transition-color', 'none');
+        motionInd.textContent = 'MOTION: REDUCED';
+        motionBtn.classList.add('vnm-state-active');
+        showToast('info', 'Reduced Motion Active', 'All kinetic animations bypassed.');
+      } else {
+        document.documentElement.style.removeProperty('--vnm-duration-micro');
+        document.documentElement.style.removeProperty('--vnm-duration-fast');
+        document.documentElement.style.removeProperty('--vnm-duration-nominal');
+        document.documentElement.style.removeProperty('--vnm-transition-color');
+        motionInd.textContent = 'MOTION: ON';
+        motionBtn.classList.remove('vnm-state-active');
+        showToast('info', 'Kinetic Physics Active', 'Tactical snaps restored.');
+      }
+    };
+
+    // 7. Command Palette Modal (Ctrl+K)
+    const cmdModal = document.getElementById('os-cmd-modal');
+    const cmdInput = document.getElementById('os-cmd-search');
+    const cmdOpenBtn = document.getElementById('btn-os-cmd');
+    const cmdOptions = document.querySelectorAll('#os-cmd-options li');
+
+    function openCmdModal() {
+      cmdModal.classList.add('vnm-open');
+      cmdInput.value = '';
+      cmdInput.focus();
+    }
+    function closeCmdModal() {
+      cmdModal.classList.remove('vnm-open');
+    }
+
+    cmdOpenBtn.onclick = openCmdModal;
+    cmdModal.onclick = (e) => { if (e.target === cmdModal) closeCmdModal(); };
+
+    cmdOptions.forEach(opt => {
+      opt.onclick = () => {
+        const target = opt.getAttribute('data-goto');
+        navigateToScreen(target);
+        closeCmdModal();
+      };
+    });
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (cmdModal.classList.contains('vnm-open')) closeCmdModal();
+        else openCmdModal();
+      } else if (e.key === 'Escape') {
+        if (!bootOverlay.classList.contains('boot-finished')) dismissBoot();
+        if (cmdModal.classList.contains('vnm-open')) closeCmdModal();
+      }
+    });
+
+    // Live Clock
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('os-live-clock').textContent = now.toTimeString().split(' ')[0] + ' UTC';
+    }, 1000);
+  </script>
+</body>
+</html>
