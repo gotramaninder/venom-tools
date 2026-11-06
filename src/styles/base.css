@@ -1,0 +1,115 @@
+/**
+ * VENOM OS — Base Styles, Reset & Accessibility Primitives
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* Robust Local System Fallbacks (Offline & Air-Gap Resilience) */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: local('Space Grotesk'), local('Segoe UI'), local('Arial');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Sans';
+  src: local('Geist Sans'), local('Inter'), local('Segoe UI'), local('system-ui');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: local('JetBrains Mono'), local('Geist Mono'), local('Consolas'), local('SF Mono');
+  font-display: swap;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  background-color: var(--vnm-void);
+  color: var(--vnm-text-chrome);
+  font-family: var(--vnm-font-sans);
+  line-height: var(--vnm-lh-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--vnm-obsidian);
+  color: var(--vnm-text-chrome);
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY: UNIVERSAL FOCUS-VISIBLE RING
+   ========================================================================== */
+:focus-visible {
+  outline: 2px solid var(--vnm-crimson-core) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 12px var(--vnm-crimson-dim) !important;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High-contrast text selections */
+::selection {
+  background-color: var(--vnm-crimson-dim);
+  color: var(--vnm-text-specular);
+}
+
+/* ==========================================================================
+   AEROSPACE PRECISION SCROLLBARS
+   ========================================================================== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--vnm-obsidian);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vnm-surface-active);
+  border-radius: var(--vnm-radius-sharp);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vnm-crimson-deep);
+  border-color: var(--vnm-crimson-border);
+}
+
+/* Accessible Interactive Target Minimum */
+button, input, select, textarea, a {
+  min-height: 36px;
+  font-family: inherit;
+}
+
+/* Code & Monospace Primitives */
+code, pre, kbd, .vnm-mono {
+  font-family: var(--vnm-font-mono);
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+}
+
+/* Screen Reader Only Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
