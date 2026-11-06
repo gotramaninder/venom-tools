@@ -1,0 +1,147 @@
+/**
+ * VENOM OS — Responsive Layouts & Breakpoint Rules
+ * Desktop (24-Column), Laptop (16:10), Tablet & Mobile Viewports
+ */
+
+/* ==========================================================================
+   DESKTOP / ULTRAWIDE (Default: >= 1200px)
+   ========================================================================== */
+.vnm-layout-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.vnm-layout-horizon {
+  display: grid;
+  grid-template-columns: var(--vnm-layout-telemetryRailWidth, 280px) 1fr var(--vnm-layout-inspectorBladeWidth, 360px);
+  flex: 1;
+  overflow: hidden;
+}
+
+.vnm-rail-left {
+  background: var(--vnm-surface-blade);
+  border-right: var(--vnm-border-subtle);
+  overflow-y: auto;
+}
+
+.vnm-viewport-center {
+  padding: var(--vnm-sp-6);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--vnm-sp-6);
+}
+
+.vnm-blade-right {
+  background: var(--vnm-surface-blade);
+  border-left: var(--vnm-border-subtle);
+  overflow-y: auto;
+}
+
+/* 24-Column Aerospace Grid */
+.vnm-grid-24 {
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
+  gap: var(--vnm-sp-4);
+}
+
+.vnm-col-span-6 { grid-column: span 6; }
+.vnm-col-span-8 { grid-column: span 8; }
+.vnm-col-span-12 { grid-column: span 12; }
+.vnm-col-span-16 { grid-column: span 16; }
+.vnm-col-span-24 { grid-column: span 24; }
+
+/* ==========================================================================
+   LAPPOINT / WORKSTATION (992px to 1199px)
+   ========================================================================== */
+@media (max-width: 1199px) {
+  .vnm-layout-horizon {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .vnm-blade-right {
+    display: none; /* Auto-collapses into flyout drawer on laptop */
+  }
+
+  .vnm-grid-24 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .vnm-col-span-6 { grid-column: span 6; }
+  .vnm-col-span-8 { grid-column: span 12; }
+  .vnm-col-span-12 { grid-column: span 12; }
+  .vnm-col-span-16 { grid-column: span 12; }
+}
+
+/* ==========================================================================
+   TABLET VIEWPORT (768px to 991px)
+   ========================================================================== */
+@media (max-width: 991px) {
+  .vnm-layout-horizon {
+    grid-template-columns: 64px 1fr; /* Rail collapses to tactical icon dock */
+  }
+
+  .vnm-rail-left .vnm-nav-label {
+    display: none;
+  }
+
+  .vnm-viewport-center {
+    padding: var(--vnm-sp-4);
+  }
+
+  .vnm-grid-24 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .vnm-col-span-6,
+  .vnm-col-span-8,
+  .vnm-col-span-12,
+  .vnm-col-span-16 {
+    grid-column: span 6;
+  }
+}
+
+/* ==========================================================================
+   MOBILE VIEWPORT (< 768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .vnm-layout-horizon {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .vnm-rail-left {
+    display: none; /* Replaced by bottom action dock or hamburger flyout */
+  }
+
+  .vnm-viewport-center {
+    padding: var(--vnm-sp-4);
+    gap: var(--vnm-sp-4);
+  }
+
+  .vnm-grid-24 {
+    display: flex;
+    flex-direction: column;
+    gap: var(--vnm-sp-4);
+  }
+
+  .vnm-nav-bar {
+    padding: 0 var(--vnm-sp-4);
+  }
+
+  .vnm-nav-items {
+    display: none; /* Collapses on mobile */
+  }
+
+  .vnm-modal {
+    max-width: 100%;
+    margin: var(--vnm-sp-3);
+  }
+
+  .vnm-command-panel {
+    max-width: 100%;
+    margin: var(--vnm-sp-3);
+  }
+}
