@@ -1,0 +1,917 @@
+/**
+ * VENOM OS — Comprehensive Component Library Styles
+ * All 10 Primitives with Full State Matrices:
+ * default, hover, active, focus, disabled, loading, success, error.
+ */
+
+/* ==========================================================================
+   1. BUTTON COMPONENT
+   ========================================================================== */
+.vnm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vnm-sp-3);
+  padding: 0 var(--vnm-sp-4);
+  height: 38px;
+  font-family: var(--vnm-font-sans);
+  font-size: var(--vnm-fs-body-sm);
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--vnm-radius-sharp);
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  white-space: nowrap;
+  transition: var(--vnm-transition-color), transform 80ms var(--vnm-ease-tactical);
+  background: var(--vnm-surface-blade);
+  border: var(--vnm-border-edge);
+  color: var(--vnm-text-chrome);
+  box-shadow: var(--vnm-rim-highlight);
+}
+
+/* Button Variants */
+.vnm-btn-primary {
+  background: var(--vnm-crimson-core);
+  border-color: var(--vnm-crimson-pulse);
+  color: var(--vnm-text-specular);
+  box-shadow: var(--vnm-rim-bright), 0 2px 10px rgba(224, 17, 58, 0.35);
+}
+
+.vnm-btn-tactical {
+  background: var(--vnm-surface-elevated);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--vnm-text-specular);
+}
+
+.vnm-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--vnm-text-titanium);
+  box-shadow: none;
+}
+
+.vnm-btn-danger {
+  background: var(--vnm-status-danger-tint);
+  border-color: var(--vnm-status-danger-border);
+  color: var(--vnm-status-danger);
+}
+
+/* Button States */
+.vnm-btn:hover:not(:disabled):not(.vnm-state-disabled) {
+  background-color: var(--vnm-surface-hover);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--vnm-text-specular);
+}
+
+.vnm-btn-primary:hover:not(:disabled):not(.vnm-state-disabled) {
+  background-color: var(--vnm-crimson-pulse);
+  box-shadow: var(--vnm-rim-bright), 0 4px 16px rgba(224, 17, 58, 0.5);
+}
+
+.vnm-btn:active:not(:disabled):not(.vnm-state-disabled),
+.vnm-btn.vnm-state-active {
+  transform: translateY(1px);
+  background-color: var(--vnm-surface-active);
+  border-color: var(--vnm-crimson-core);
+}
+
+.vnm-btn-primary:active:not(:disabled):not(.vnm-state-disabled),
+.vnm-btn-primary.vnm-state-active {
+  background-color: var(--vnm-crimson-deep);
+  border-color: var(--vnm-crimson-core);
+}
+
+/* Disabled State */
+.vnm-btn:disabled,
+.vnm-btn.vnm-state-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: var(--vnm-surface-blade) !important;
+  border-color: var(--vnm-border-subtle) !important;
+  color: var(--vnm-text-lead) !important;
+  box-shadow: none !important;
+}
+
+/* Loading State */
+.vnm-btn.vnm-state-loading {
+  position: relative;
+  cursor: wait;
+  pointer-events: none;
+  color: transparent !important;
+}
+
+.vnm-btn.vnm-state-loading::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--vnm-text-specular);
+  border-radius: 50%;
+  animation: vnm-spin 700ms linear infinite;
+}
+
+/* Success & Error State Modifiers */
+.vnm-btn.vnm-state-success {
+  background-color: var(--vnm-status-emerald-tint);
+  border-color: var(--vnm-status-emerald);
+  color: var(--vnm-status-emerald);
+}
+
+.vnm-btn.vnm-state-error {
+  background-color: var(--vnm-status-danger-tint);
+  border-color: var(--vnm-status-danger);
+  color: var(--vnm-status-danger);
+}
+
+/* ==========================================================================
+   2. INPUT COMPONENT
+   ========================================================================== */
+.vnm-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vnm-sp-2);
+  width: 100%;
+}
+
+.vnm-label {
+  font-family: var(--vnm-font-display);
+  font-size: var(--vnm-fs-caption);
+  font-weight: 500;
+  color: var(--vnm-text-titanium);
+  letter-spacing: 0.02em;
+}
+
+.vnm-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--vnm-surface-blade);
+  border: var(--vnm-border-edge);
+  border-radius: var(--vnm-radius-sharp);
+  transition: var(--vnm-transition-color);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.vnm-input-wrapper:hover:not(.vnm-disabled) {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.vnm-input-wrapper:focus-within,
+.vnm-input-wrapper.vnm-state-focus {
+  border-color: var(--vnm-crimson-core);
+  box-shadow: 0 0 0 1px var(--vnm-crimson-core), 0 0 12px var(--vnm-crimson-tint);
+}
+
+.vnm-input {
+  width: 100%;
+  height: 38px;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0 var(--vnm-sp-4);
+  font-family: var(--vnm-font-sans);
+  font-size: var(--vnm-fs-body-sm);
+  color: var(--vnm-text-specular);
+}
+
+.vnm-input::placeholder {
+  color: var(--vnm-text-lead);
+}
+
+.vnm-input-icon {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--vnm-sp-3);
+  color: var(--vnm-text-alloy);
+  font-size: var(--vnm-fs-body-sm);
+}
+
+/* Input State Modifiers */
+.vnm-input-wrapper.vnm-state-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--vnm-void);
+  border-color: var(--vnm-border-subtle);
+}
+
+.vnm-input-wrapper.vnm-state-error {
+  border-color: var(--vnm-status-danger);
+  box-shadow: 0 0 0 1px var(--vnm-status-danger), 0 0 8px var(--vnm-status-danger-tint);
+}
+
+.vnm-input-wrapper.vnm-state-success {
+  border-color: var(--vnm-status-emerald);
+  box-shadow: 0 0 0 1px var(--vnm-status-emerald), 0 0 8px var(--vnm-status-emerald-tint);
+}
+
+.vnm-input-helper {
+  font-size: var(--vnm-fs-micro);
+  color: var(--vnm-text-alloy);
+  font-family: var(--vnm-font-mono);
+}
+
+.vnm-input-helper.vnm-error {
+  color: var(--vnm-status-danger);
+}
+
+.vnm-input-helper.vnm-success {
+  color: var(--vnm-status-emerald);
+}
+
+/* ==========================================================================
+   3. DROPDOWN / SELECT COMPONENT
+   ========================================================================== */
+.vnm-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.vnm-dropdown-trigger {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--vnm-sp-4);
+  background: var(--vnm-surface-blade);
+  border: var(--vnm-border-edge);
+  border-radius: var(--vnm-radius-sharp);
+  color: var(--vnm-text-specular);
+  font-size: var(--vnm-fs-body-sm);
+  cursor: pointer;
+  box-shadow: var(--vnm-rim-highlight);
+  transition: var(--vnm-transition-color);
+}
+
+.vnm-dropdown-trigger:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.vnm-dropdown-trigger[aria-expanded="true"] {
+  border-color: var(--vnm-crimson-core);
+}
+
+.vnm-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: var(--vnm-surface-elevated);
+  border: var(--vnm-border-bright);
+  border-radius: var(--vnm-radius-sharp);
+  box-shadow: var(--vnm-shadow-floating);
+  backdrop-filter: var(--vnm-glass-filter);
+  z-index: 50;
+  list-style: none;
+  padding: var(--vnm-sp-2) 0;
+  max-height: 240px;
+  overflow-y: auto;
+  display: none;
+}
+
+.vnm-dropdown-menu.vnm-open {
+  display: block;
+  animation: vnm-fade-down 140ms var(--vnm-ease-tactical);
+}
+
+.vnm-dropdown-item {
+  padding: var(--vnm-sp-3) var(--vnm-sp-4);
+  font-size: var(--vnm-fs-body-sm);
+  color: var(--vnm-text-chrome);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 80ms var(--vnm-ease-tactical);
+}
+
+.vnm-dropdown-item:hover,
+.vnm-dropdown-item.vnm-highlighted {
+  background-color: var(--vnm-crimson-dim);
+  color: var(--vnm-text-specular);
+}
+
+.vnm-dropdown-item[aria-selected="true"] {
+  color: var(--vnm-crimson-pulse);
+  font-weight: 600;
+  background-color: rgba(224, 17, 58, 0.08);
+}
+
+/* ==========================================================================
+   4. MODAL / DIALOG COMPONENT
+   ========================================================================== */
+.vnm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 4, 6, 0.85);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--vnm-sp-4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms var(--vnm-ease-tactical);
+}
+
+.vnm-modal-backdrop.vnm-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.vnm-modal {
+  width: 100%;
+  max-width: 580px;
+  background: var(--vnm-surface-blade);
+  border: var(--vnm-border-bright);
+  border-radius: var(--vnm-radius-sharp);
+  box-shadow: var(--vnm-shadow-floating), inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+  transform: scale(0.96);
+  transition: transform 180ms var(--vnm-ease-tactical);
+  display: flex;
+  flex-direction: column;
+}
+
+.vnm-modal-backdrop.vnm-open .vnm-modal {
+  transform: scale(1);
+}
+
+.vnm-modal-header {
+  padding: var(--vnm-sp-5);
+  border-bottom: var(--vnm-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vnm-modal-title {
+  font-family: var(--vnm-font-display);
+  font-size: var(--vnm-fs-h3);
+  font-weight: 600;
+  color: var(--vnm-text-specular);
+  letter-spacing: -0.01em;
+}
+
+.vnm-modal-body {
+  padding: var(--vnm-sp-5);
+  font-size: var(--vnm-fs-body-sm);
+  color: var(--vnm-text-titanium);
+  line-height: var(--vnm-lh-relaxed);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.vnm-modal-footer {
+  padding: var(--vnm-sp-4) var(--vnm-sp-5);
+  border-top: var(--vnm-border-subtle);
+  background: var(--vnm-surface-elevated);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--vnm-sp-3);
+}
+
+/* ==========================================================================
+   5. TOOLTIP COMPONENT
+   ========================================================================== */
+.vnm-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.vnm-tooltip {
+  position: absolute;
+  padding: var(--vnm-sp-2) var(--vnm-sp-3);
+  background: var(--vnm-surface-active);
+  border: var(--vnm-border-bright);
+  border-radius: var(--vnm-radius-sharp);
+  box-shadow: var(--vnm-shadow-chassis);
+  color: var(--vnm-text-specular);
+  font-family: var(--vnm-font-mono);
+  font-size: var(--vnm-fs-micro);
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 60;
+  transition: opacity 120ms var(--vnm-ease-tactical), transform 120ms var(--vnm-ease-tactical);
+}
+
+.vnm-tooltip-top {
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+}
+
+.vnm-tooltip-bottom {
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.vnm-tooltip-left {
+  right: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%) translateX(4px);
+}
+
+.vnm-tooltip-right {
+  left: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+.vnm-tooltip-wrapper:hover .vnm-tooltip,
+.vnm-tooltip-wrapper:focus-within .vnm-tooltip,
+.vnm-tooltip.vnm-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.vnm-tooltip-left.vnm-visible,
+.vnm-tooltip-wrapper:hover .vnm-tooltip-left {
+  transform: translateY(-50%) translateX(0);
+}
+
+.vnm-tooltip-right.vnm-visible,
+.vnm-tooltip-wrapper:hover .vnm-tooltip-right {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ==========================================================================
+   6. NAVIGATION COMPONENT
+   ========================================================================== */
+.vnm-nav-bar {
+  display: flex;
+  align-items: center;
+  background: var(--vnm-surface-blade);
+  border-bottom: var(--vnm-border-subtle);
+  height: 48px;
+  padding: 0 var(--vnm-sp-5);
+  gap: var(--vnm-sp-6);
+  user-select: none;
+}
+
+.vnm-nav-brand {
+  font-family: var(--vnm-font-display);
+  font-size: var(--vnm-fs-body);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--vnm-text-specular);
+  display: flex;
+  align-items: center;
+  gap: var(--vnm-sp-2);
+}
+
+.vnm-nav-brand-pip {
+  width: 6px;
+  height: 6px;
+  background: var(--vnm-crimson-core);
+  border-radius: 1px;
+}
+
+.vnm-nav-items {
+  display: flex;
+  align-items: center;
+  gap: var(--vnm-sp-2);
+  list-style: none;
+  height: 100%;
+}
+
+.vnm-nav-link {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vnm-sp-3);
+  padding: 0 var(--vnm-sp-3);
+  font-size: var(--vnm-fs-caption);
+  font-family: var(--vnm-font-mono);
+  color: var(--vnm-text-titanium);
+  text-decoration: none;
+  border-radius: var(--vnm-radius-sharp);
+  transition: var(--vnm-transition-color);
+  position: relative;
+  cursor: pointer;
+}
+
+.vnm-nav-link:hover {
+  color: var(--vnm-text-specular);
+  background: var(--vnm-surface-elevated);
+}
+
+.vnm-nav-link.vnm-active {
+  color: var(--vnm-text-specular);
+  background: var(--vnm-surface-elevated);
+}
+
+.vnm-nav-link.vnm-active::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--vnm-crimson-core);
+  box-shadow: 0 0 8px var(--vnm-crimson-core);
+}
+
+/* ==========================================================================
+   7. NOTIFICATION / TOAST COMPONENT
+   ========================================================================== */
+.vnm-notification-container {
+  position: fixed;
+  bottom: var(--vnm-sp-5);
+  right: var(--vnm-sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vnm-sp-3);
+  z-index: 110;
+  max-width: 400px;
+  width: calc(100vw - 32px);
+}
+
+.vnm-notification {
+  background: var(--vnm-surface-blade);
+  border: var(--vnm-border-edge);
+  border-left: 3px solid var(--vnm-crimson-core);
+  border-radius: var(--vnm-radius-sharp);
+  padding: var(--vnm-sp-4);
+  box-shadow: var(--vnm-shadow-floating);
+  backdrop-filter: var(--vnm-glass-filter);
+  display: flex;
+  gap: var(--vnm-sp-4);
+  align-items: flex-start;
+  animation: vnm-slide-left 160ms var(--vnm-ease-tactical);
+}
+
+.vnm-notification-success {
+  border-left-color: var(--vnm-status-emerald);
+}
+
+.vnm-notification-warning {
+  border-left-color: var(--vnm-status-amber);
+}
+
+.vnm-notification-error {
+  border-left-color: var(--vnm-status-danger);
+}
+
+.vnm-notification-content {
+  flex: 1;
+}
+
+.vnm-notification-title {
+  font-family: var(--vnm-font-display);
+  font-size: var(--vnm-fs-body-sm);
+  font-weight: 600;
+  color: var(--vnm-text-specular);
+  margin-bottom: var(--vnm-sp-1);
+}
+
+.vnm-notification-message {
+  font-size: var(--vnm-fs-caption);
+  color: var(--vnm-text-titanium);
+  line-height: var(--vnm-lh-normal);
+}
+
+.vnm-notification-close {
+  background: none;
+  border: none;
+  color: var(--vnm-text-alloy);
+  cursor: pointer;
+  padding: var(--vnm-sp-1);
+  font-size: 16px;
+  line-height: 1;
+  min-height: auto;
+}
+
+.vnm-notification-close:hover {
+  color: var(--vnm-text-specular);
+}
+
+/* ==========================================================================
+   8. COMMAND PANEL COMPONENT (Cmd+K / Ctrl+K)
+   ========================================================================== */
+.vnm-command-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 4, 6, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 90;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 15vh;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms var(--vnm-ease-tactical);
+}
+
+.vnm-command-backdrop.vnm-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.vnm-command-panel {
+  width: 100%;
+  max-width: 580px;
+  background: var(--vnm-surface-blade);
+  border: var(--vnm-border-bright);
+  border-radius: var(--vnm-radius-sharp);
+  box-shadow: var(--vnm-shadow-floating), 0 0 0 1px rgba(224, 17, 58, 0.2);
+  overflow: hidden;
+}
+
+.vnm-command-input-box {
+  display: flex;
+  align-items: center;
+  padding: var(--vnm-sp-4) var(--vnm-sp-5);
+  border-bottom: var(--vnm-border-subtle);
+  background: var(--vnm-surface-elevated);
+}
+
+.vnm-command-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--vnm-text-specular);
+  font-family: var(--vnm-font-sans);
+  font-size: var(--vnm-fs-body);
+}
+
+.vnm-command-list {
+  max-height: 320px;
+  overflow-y: auto;
+  list-style: none;
+  padding: var(--vnm-sp-2) 0;
+}
+
+.vnm-command-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--vnm-sp-3) var(--vnm-sp-5);
+  color: var(--vnm-text-chrome);
+  font-size: var(--vnm-fs-body-sm);
+  cursor: pointer;
+  transition: background-color 80ms var(--vnm-ease-tactical);
+}
+
+.vnm-command-item:hover,
+.vnm-command-item.vnm-active {
+  background: var(--vnm-crimson-dim);
+  color: var(--vnm-text-specular);
+}
+
+.vnm-command-shortcut {
+  font-family: var(--vnm-font-mono);
+  font-size: var(--vnm-fs-micro);
+  color: var(--vnm-text-alloy);
+  background: var(--vnm-surface-active);
+  padding: 2px 6px;
+  border-radius: var(--vnm-radius-sharp);
+  border: var(--vnm-border-subtle);
+}
+
+/* ==========================================================================
+   9. STATUS INDICATOR & BADGE COMPONENT
+   ========================================================================== */
+.vnm-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vnm-sp-2);
+  font-family: var(--vnm-font-mono);
+  font-size: var(--vnm-fs-caption);
+  color: var(--vnm-text-titanium);
+}
+
+.vnm-status-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vnm-text-lead);
+  position: relative;
+}
+
+.vnm-status-online .vnm-status-pip {
+  background: var(--vnm-status-emerald);
+}
+
+.vnm-status-online.vnm-pulse .vnm-status-pip::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--vnm-status-emerald);
+  animation: vnm-pulse 1.8s infinite;
+}
+
+.vnm-status-idle .vnm-status-pip {
+  background: var(--vnm-status-amber);
+}
+
+.vnm-status-busy .vnm-status-pip {
+  background: var(--vnm-status-cyan);
+}
+
+.vnm-status-error .vnm-status-pip {
+  background: var(--vnm-crimson-core);
+}
+
+.vnm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vnm-sp-2);
+  padding: 2px 8px;
+  font-family: var(--vnm-font-mono);
+  font-size: var(--vnm-fs-micro);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--vnm-surface-elevated);
+  border: var(--vnm-border-subtle);
+  border-radius: var(--vnm-radius-sharp);
+  color: var(--vnm-text-titanium);
+}
+
+.vnm-badge-crimson {
+  background: var(--vnm-crimson-dim);
+  border-color: var(--vnm-crimson-border);
+  color: var(--vnm-crimson-pulse);
+}
+
+.vnm-badge-emerald {
+  background: var(--vnm-status-emerald-tint);
+  border-color: var(--vnm-status-emerald-border);
+  color: var(--vnm-status-emerald);
+}
+
+/* ==========================================================================
+   10. EXECUTION STREAM COMPONENT (Autonomous Stream Container)
+   ========================================================================== */
+.vnm-stream-container {
+  background: var(--vnm-surface-blade);
+  border: var(--vnm-border-edge);
+  border-radius: var(--vnm-radius-sharp);
+  overflow: hidden;
+  box-shadow: var(--vnm-shadow-chassis);
+}
+
+/* CRITICAL REQUIREMENT 8 DISCLAIMER BANNER */
+.vnm-preview-disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px var(--vnm-sp-4);
+  background: rgba(245, 158, 11, 0.08);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  font-family: var(--vnm-font-mono);
+  font-size: var(--vnm-fs-micro);
+  color: var(--vnm-status-amber);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.vnm-stream-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--vnm-sp-3) var(--vnm-sp-4);
+  background: var(--vnm-surface-elevated);
+  border-bottom: var(--vnm-border-subtle);
+}
+
+.vnm-stream-title {
+  font-family: var(--vnm-font-mono);
+  font-size: var(--vnm-fs-caption);
+  font-weight: 600;
+  color: var(--vnm-text-specular);
+  display: flex;
+  align-items: center;
+  gap: var(--vnm-sp-3);
+}
+
+.vnm-stream-body {
+  padding: var(--vnm-sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vnm-sp-3);
+}
+
+.vnm-stream-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vnm-sp-3);
+  font-size: var(--vnm-fs-body-sm);
+  color: var(--vnm-text-chrome);
+}
+
+.vnm-step-marker {
+  font-family: var(--vnm-font-mono);
+  font-size: var(--vnm-fs-micro);
+  color: var(--vnm-crimson-core);
+  padding-top: 2px;
+}
+
+.vnm-command-block {
+  background: var(--vnm-void);
+  border: var(--vnm-border-subtle);
+  border-radius: var(--vnm-radius-sharp);
+  padding: var(--vnm-sp-3) var(--vnm-sp-4);
+  font-family: var(--vnm-font-mono);
+  font-size: var(--vnm-fs-caption);
+  color: var(--vnm-text-specular);
+  overflow-x: auto;
+}
+
+/* ==========================================================================
+   KEYFRAME ANIMATIONS
+   ========================================================================== */
+@keyframes vnm-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes vnm-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@keyframes vnm-fade-down {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vnm-slide-left {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+
+/* ==========================================================================
+   11. ADVANCED CINEMATIC LIGHTING & 3D CANVASES
+   ========================================================================== */
+.vnm-specular-sheen {
+  position: relative;
+}
+
+.vnm-specular-sheen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+  pointer-events: none;
+}
+
+.vnm-canvas-3d-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.vnm-canvas-3d {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Audio Volume Slider in Horizon Bar */
+.vnm-volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 64px;
+  height: 4px;
+  background: var(--vnm-surface-active);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.vnm-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--vnm-crimson-core);
+  box-shadow: 0 0 6px var(--vnm-crimson-pulse);
+  cursor: pointer;
+}
+
+.vnm-volume-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--vnm-crimson-core);
+  border: none;
+  box-shadow: 0 0 6px var(--vnm-crimson-pulse);
+  cursor: pointer;
+}
