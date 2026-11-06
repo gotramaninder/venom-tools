@@ -1,0 +1,158 @@
+/**
+ * VENOM OS — Unified CSS Design Variables
+ * ANOS-01 Specification: Obsidian, Graphite, Crimson, Titanium
+ */
+
+:root {
+  /* ==========================================================================
+     SUBSTRATE & SURFACE SPECTRUM
+     ========================================================================== */
+  --vnm-void: #030406;
+  --vnm-obsidian: #07080C;
+  --vnm-surface-blade: #0C0E14;
+  --vnm-surface-elevated: #12151F;
+  --vnm-surface-active: #1A1E2C;
+  --vnm-surface-hover: #151924;
+  --vnm-glass-backdrop: rgba(12, 14, 20, 0.82);
+
+  /* ==========================================================================
+     CRIMSON PRIORITY SPECTRUM
+     ========================================================================== */
+  --vnm-crimson-core: #E0113A;
+  --vnm-crimson-pulse: #FF1C47;
+  --vnm-crimson-deep: #4A0612;
+  --vnm-crimson-tint: rgba(224, 17, 58, 0.08);
+  --vnm-crimson-dim: rgba(224, 17, 58, 0.16);
+  --vnm-crimson-glow: rgba(224, 17, 58, 0.28);
+  --vnm-crimson-border: rgba(224, 17, 58, 0.45);
+
+  /* ==========================================================================
+     METALLIC & TITANIUM TYPOGRAPHY SPECTRUM
+     ========================================================================== */
+  --vnm-text-specular: #F5F7FA; /* 96% contrast */
+  --vnm-text-chrome: #D8DEE9;   /* Primary body copy */
+  --vnm-text-titanium: #A6B0C0; /* Secondary metadata */
+  --vnm-text-alloy: #687385;    /* Micro-datums */
+  --vnm-text-lead: #394150;     /* Inactive/disabled */
+
+  /* ==========================================================================
+     STATUS SUB-PALETTES (<5% Area Strictly Controlled)
+     ========================================================================== */
+  --vnm-status-emerald: #10B981;
+  --vnm-status-emerald-tint: rgba(16, 185, 129, 0.12);
+  --vnm-status-emerald-border: rgba(16, 185, 129, 0.35);
+
+  --vnm-status-amber: #F59E0B;
+  --vnm-status-amber-tint: rgba(245, 158, 11, 0.12);
+  --vnm-status-amber-border: rgba(245, 158, 11, 0.35);
+
+  --vnm-status-cyan: #38BDF8;
+  --vnm-status-cyan-tint: rgba(56, 189, 248, 0.12);
+  --vnm-status-cyan-border: rgba(56, 189, 248, 0.35);
+
+  --vnm-status-danger: #EF4444;
+  --vnm-status-danger-tint: rgba(239, 68, 68, 0.14);
+  --vnm-status-danger-border: rgba(239, 68, 68, 0.45);
+
+  /* ==========================================================================
+     OPTICAL BORDERS & SPECULAR RIM LIGHTS
+     ========================================================================== */
+  --vnm-border-subtle: 1px solid rgba(255, 255, 255, 0.06);
+  --vnm-border-edge: 1px solid rgba(255, 255, 255, 0.12);
+  --vnm-border-bright: 1px solid rgba(255, 255, 255, 0.22);
+  --vnm-border-crimson: 1px solid var(--vnm-crimson-border);
+
+  --vnm-rim-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  --vnm-rim-bright: inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
+  --vnm-rim-crimson: inset 0 1px 0 0 rgba(255, 42, 85, 0.45);
+
+  /* ==========================================================================
+     SHADOWS & DEPTH
+     ========================================================================== */
+  --vnm-shadow-chassis: 0 4px 16px -2px rgba(0, 0, 0, 0.7);
+  --vnm-shadow-elevated: 0 8px 24px -4px rgba(0, 0, 0, 0.85), 0 2px 6px -1px rgba(0, 0, 0, 0.6);
+  --vnm-shadow-floating: 0 16px 40px -8px rgba(0, 0, 0, 0.95);
+  --vnm-shadow-focus: 0 0 0 2px var(--vnm-obsidian), 0 0 0 4px var(--vnm-crimson-core);
+
+  /* ==========================================================================
+     FONTS & TYPOGRAPHY
+     ========================================================================== */
+  --vnm-font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --vnm-font-sans: 'Geist Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --vnm-font-mono: 'JetBrains Mono', 'Geist Mono', 'SF Mono', Consolas, monospace;
+
+  /* Type Scale */
+  --vnm-fs-nano: 0.6875rem;    /* 11px */
+  --vnm-fs-micro: 0.75rem;     /* 12px */
+  --vnm-fs-caption: 0.8125rem; /* 13px */
+  --vnm-fs-body-sm: 0.875rem;  /* 14px */
+  --vnm-fs-body: 1rem;         /* 16px */
+  --vnm-fs-body-lg: 1.125rem;  /* 18px */
+  --vnm-fs-h3: 1.25rem;        /* 20px */
+  --vnm-fs-h2: 1.5rem;         /* 24px */
+  --vnm-fs-h1: 1.875rem;       /* 30px */
+  --vnm-fs-display: 2.5rem;    /* 40px */
+
+  /* Line Heights */
+  --vnm-lh-tight: 1.2;
+  --vnm-lh-snug: 1.35;
+  --vnm-lh-normal: 1.5;
+  --vnm-lh-relaxed: 1.65;
+
+  /* ==========================================================================
+     SPACING SYSTEM (Base-4)
+     ========================================================================== */
+  --vnm-sp-1: 2px;
+  --vnm-sp-2: 4px;
+  --vnm-sp-3: 8px;
+  --vnm-sp-4: 12px;
+  --vnm-sp-5: 16px;
+  --vnm-sp-6: 24px;
+  --vnm-sp-8: 32px;
+  --vnm-sp-10: 40px;
+  --vnm-sp-12: 48px;
+  --vnm-sp-16: 64px;
+  --vnm-sp-20: 80px;
+
+  /* Radius */
+  --vnm-radius-none: 0px;
+  --vnm-radius-sharp: 2px;
+  --vnm-radius-soft: 4px;
+  --vnm-radius-chamfer: 6px;
+
+  /* ==========================================================================
+     MOTION & PHYSICS
+     ========================================================================== */
+  --vnm-ease-tactical: cubic-bezier(0.16, 1, 0.3, 1);
+  --vnm-duration-micro: 80ms;
+  --vnm-duration-fast: 140ms;
+  --vnm-duration-nominal: 200ms;
+  --vnm-duration-deliberate: 300ms;
+
+  --vnm-transition-color: color 140ms var(--vnm-ease-tactical),
+                          background-color 140ms var(--vnm-ease-tactical),
+                          border-color 140ms var(--vnm-ease-tactical);
+  --vnm-transition-transform: transform 200ms var(--vnm-ease-tactical),
+                              opacity 200ms var(--vnm-ease-tactical);
+}
+
+/* ==========================================================================
+   REDUCED MOTION SUPPORT (Requirement 7)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --vnm-duration-micro: 0ms !important;
+    --vnm-duration-fast: 0ms !important;
+    --vnm-duration-nominal: 0ms !important;
+    --vnm-duration-deliberate: 0ms !important;
+    --vnm-transition-color: none !important;
+    --vnm-transition-transform: none !important;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
